@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Biohazard } from "@/components/Biohazard";
 import { Mapa } from "@/components/Mapa";
@@ -24,6 +24,46 @@ async function play(body: object): Promise<{ view?: GameView; error?: string; ok
   return { ...data, ok: response.ok };
 }
 
+type Flash = { id: string; kicker: string; title: string; paragraphs: string[] };
+
+function diffNews(previous: GameView, next: GameView): Flash[] {
+  const flashes: Flash[] = [];
+  const outcome = next.lastOutcome;
+  if (outcome && next.status === "playing") {
+    const before = previous.lastOutcome;
+    if (!before || before.title !== outcome.title || before.text !== outcome.text) {
+      flashes.push({
+        id: `out-${outcome.title}-${outcome.text}`,
+        kicker: "Novidade",
+        title: outcome.title,
+        paragraphs: [outcome.text, outcome.lesson].filter((line) => line.length > 0),
+      });
+    }
+  }
+  if (next.report && (!previous.report || previous.report.date !== next.report.date || previous.report.day !== next.report.day)) {
+    const report = next.report;
+    flashes.push({
+      id: `bol-${report.date}-${report.day}`,
+      kicker: "Boletim",
+      title: `Boletim de ${formatDayMonth(report.date)}`,
+      paragraphs: [
+        `${people(report.newInfections)} casos novos, ${people(report.recoveries)} recuperações, ${people(report.deaths)} óbitos. A pesquisa andou ${report.researchGain.toFixed(1).replace(".", ",")} ponto(s).`,
+        ...report.notes,
+      ],
+    });
+  }
+  const tips = next.tips.filter((tip) => !previous.tips.includes(tip));
+  if (tips.length) {
+    flashes.push({
+      id: `tips-${tips.join("|")}`,
+      kicker: "Notificação",
+      title: "A sala chama a atenção",
+      paragraphs: tips,
+    });
+  }
+  return flashes;
+}
+
 export function Sala() {
   const params = useSearchParams();
   const id = params.get("partida");
@@ -31,10 +71,13 @@ export function Sala() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [missing, setMissing] = useState(false);
-  const [panel, setPanel] = useState<"sala" | "upgrades">("sala");
+  const [panel, setPanel] = useState<"sala" | "gestao" | "news">("sala");
   const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("saude");
   const [selected, setSelected] = useState("centro");
   const [codex, setCodex] = useState(false);
+  const [popup, setPopup] = useState<Flash[] | null>(null);
+  const [unread, setUnread] = useState(false);
+  const pendingNews = useRef<Flash[]>([]);
 
   useEffect(() => {
     if (!id) return;
@@ -49,13 +92,33 @@ export function Sala() {
     };
   }, [id]);
 
+  function reveal(next: GameView, flashes: Flash[]) {
+    if (flashes.length) setUnread(true);
+    if (next.pending && next.status === "playing") {
+      pendingNews.current = [...pendingNews.current, ...flashes];
+      return;
+    }
+    const combined = [...pendingNews.current, ...flashes];
+    pendingNews.current = [];
+    if (combined.length) setPopup(combined);
+  }
+
+  function closePopup() {
+    setPopup(null);
+    if (panel === "news") setUnread(false);
+  }
+
   async function act(body: object) {
     if (!id) return;
+    const previous = view;
     setBusy(true);
     setError(null);
     try {
       const result = await play({ ...body, id });
-      if (result.view) setView(result.view);
+      if (result.view) {
+        setView(result.view);
+        if (previous) reveal(result.view, diffNews(previous, result.view));
+      }
       if (!result.ok) setError(result.error ?? "A ação não foi aceita.");
     } catch {
       setError("A sala de situação não respondeu.");
@@ -108,8 +171,18 @@ export function Sala() {
           <button className={panel === "sala" ? "tab on" : "tab"} type="button" onClick={() => setPanel("sala")}>
             Sala
           </button>
-          <button className={panel === "upgrades" ? "tab on" : "tab"} type="button" onClick={() => setPanel("upgrades")}>
-            Upgrades{activeUpgrades > 0 ? ` · ${activeUpgrades}` : ""}
+          <button className={panel === "gestao" ? "tab on" : "tab"} type="button" onClick={() => setPanel("gestao")}>
+            Gestão{activeUpgrades > 0 ? ` · ${activeUpgrades}` : ""}
+          </button>
+          <button
+            className={panel === "news" ? "tab on" : "tab"}
+            type="button"
+            onClick={() => {
+              setPanel("news");
+              setUnread(false);
+            }}
+          >
+            News{unread ? " · novo" : ""}
           </button>
         </div>
         <button className="end-day" type="button" disabled={busy || view.status !== "playing" || Boolean(view.pending)} onClick={() => void act({ action: "end" })}>
@@ -170,25 +243,6 @@ export function Sala() {
               </div>
             ))}
           </section>
-          <section className="side-block">
-            <h2 className="display">{view.report ? `Boletim de ${formatDayMonth(view.report.date)}` : "Boletim da noite"}</h2>
-            {view.report ? (
-              <>
-                <p>
-                  {people(view.report.newInfections)} casos novos, {people(view.report.recoveries)} recuperações, {people(view.report.deaths)} óbitos. A pesquisa andou {view.report.researchGain.toFixed(1).replace(".", ",")} ponto(s).
-                </p>
-                {view.report.notes.map((note) => (
-                  <p key={note}>{note}</p>
-                ))}
-              </>
-            ) : (
-              <p>O primeiro dia ainda não fechou. Resolva o boletim e escolha as medidas antes de encerrar.</p>
-            )}
-            {view.tips.map((tip) => (
-              <p key={tip}>{tip}</p>
-            ))}
-            <Spark history={view.history.map((item) => item.infected)} />
-          </section>
           {view.modifiers.length > 0 ? (
             <section className="side-block">
               <h2 className="display">Efeitos em curso</h2>
@@ -201,38 +255,15 @@ export function Sala() {
               </div>
             </section>
           ) : null}
-          <section className="side-block">
-            <div className="plate-head">
-              <h2 className="display">Registro</h2>
-              <button className="text-link" type="button" onClick={() => setCodex(true)}>
-                Codex
-              </button>
-            </div>
-            <ul className="log">
-              {view.log.slice(0, 8).map((entry, index) => (
-                <li key={`${entry.day}-${index}`}>
-                  {formatDayMonth(addDays(view.date, entry.day - view.day))}. {entry.text}
-                </li>
-              ))}
-            </ul>
-          </section>
-          {error ? <p className="error">{error}</p> : null}
-          {view.lastOutcome && view.status === "playing" ? (
-            <section className="side-block">
-              <h2 className="display">{view.lastOutcome.title}</h2>
-              <p>{view.lastOutcome.text}</p>
-              <p>{view.lastOutcome.lesson}</p>
-            </section>
-          ) : null}
         </aside>
       </div>
-      ) : (
-      <section className="upgrades" id="upgrades">
+      ) : panel === "gestao" ? (
+      <section className="upgrades" id="gestao">
         <div className="plate-head">
-          <h2 className="display">Upgrades</h2>
+          <h2 className="display">Gestão</h2>
           <span>Medidas da gestão. Cada uma altera verba, contato, leitos ou confiança.</span>
         </div>
-        <div className="tabs" role="tablist" aria-label="Famílias de upgrade">
+        <div className="tabs" role="tablist" aria-label="Famílias de medidas">
           {TABS.map((item) => (
             <button key={item.id} className={item.id === tab ? "tab on" : "tab"} type="button" onClick={() => setTab(item.id)}>
               {item.label}
@@ -245,7 +276,56 @@ export function Sala() {
           ))}
         </div>
       </section>
+      ) : (
+      <section className="news" id="news">
+        <div className="plate-head">
+          <h2 className="display">News</h2>
+          <span>Boletins, registro e o que a cidade acabou de informar.</span>
+        </div>
+        <section className="side-block">
+          <h2 className="display">{view.report ? `Boletim de ${formatDayMonth(view.report.date)}` : "Boletim da noite"}</h2>
+          {view.report ? (
+            <>
+              <p>
+                {people(view.report.newInfections)} casos novos, {people(view.report.recoveries)} recuperações, {people(view.report.deaths)} óbitos. A pesquisa andou {view.report.researchGain.toFixed(1).replace(".", ",")} ponto(s).
+              </p>
+              {view.report.notes.map((note) => (
+                <p key={note}>{note}</p>
+              ))}
+            </>
+          ) : (
+            <p>O primeiro dia ainda não fechou. Resolva o boletim e escolha as medidas antes de encerrar.</p>
+          )}
+          {view.tips.map((tip) => (
+            <p key={tip}>{tip}</p>
+          ))}
+          <Spark history={view.history.map((item) => item.infected)} />
+        </section>
+        <section className="side-block">
+          <div className="plate-head">
+            <h2 className="display">Registro</h2>
+            <button className="text-link" type="button" onClick={() => setCodex(true)}>
+              Codex
+            </button>
+          </div>
+          <ul className="log">
+            {view.log.map((entry, index) => (
+              <li key={`${entry.day}-${index}`}>
+                {formatDayMonth(addDays(view.date, entry.day - view.day))}. {entry.text}
+              </li>
+            ))}
+          </ul>
+        </section>
+        {view.lastOutcome && view.status === "playing" ? (
+          <section className="side-block">
+            <h2 className="display">{view.lastOutcome.title}</h2>
+            <p>{view.lastOutcome.text}</p>
+            <p>{view.lastOutcome.lesson}</p>
+          </section>
+        ) : null}
+      </section>
       )}
+      {error ? <p className="error note">{error}</p> : null}
       {view.pending && view.status === "playing" ? (
         <div className="overlay">
           <section className="dossier" role="dialog" aria-modal="true" aria-labelledby="boletim-titulo">
@@ -282,6 +362,29 @@ export function Sala() {
                 Nova gestão
               </a>
             </div>
+          </section>
+        </div>
+      ) : null}
+      {popup && !(view.pending && view.status === "playing") ? (
+        <div className="overlay" onClick={closePopup}>
+          <section className="dossier news-popup" role="dialog" aria-modal="true" aria-labelledby="news-titulo" onClick={(event) => event.stopPropagation()}>
+            <div className="plate-head">
+              <p className="kicker">News</p>
+              <button className="button secondary" type="button" onClick={closePopup}>
+                Fechar
+              </button>
+            </div>
+            {popup.map((flash) => (
+              <article key={flash.id}>
+                <p className="kicker">{flash.kicker}</p>
+                <h2 className="display" id={flash.id === popup[0]?.id ? "news-titulo" : undefined}>
+                  {flash.title}
+                </h2>
+                {flash.paragraphs.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+              </article>
+            ))}
           </section>
         </div>
       ) : null}

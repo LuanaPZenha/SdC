@@ -44,7 +44,8 @@ Na sala, o topo traz a data (dia da semana, dia e mês, ano e o número do dia d
 Duas abas dividem a sala:
 
 - **Sala.** Mapa de Maricá, boletim da noite, facções, registro e o distrito selecionado.
-- **Upgrades.** As medidas, no lugar de uma faixa de cartões sobre o mapa. O número depois do nome é quantas estão ativas. Há quatro famílias: Políticas de Saúde, Controle de Fronteiras, Pesquisa e Gestão de Facções.
+- **Gestão.** As medidas, no lugar de uma faixa de cartões sobre o mapa. O número depois do nome é quantas estão ativas. Há quatro famílias: Políticas de Saúde, Controle de Fronteiras, Pesquisa e Gestão de Facções.
+- **News.** Boletim da noite, dicas, registro e o desfecho do último caso. Cada boletim, notificação ou novidade nova abre um aviso no centro da página, no mesmo papel da sala. O boletim que chega junto de um caso pendente espera a escolha e aparece em seguida.
 
 O botão **Encerrar** fica visível nas duas abas. Ele fica desligado enquanto houver um boletim sem resposta ou a partida já tiver acabado.
 
@@ -202,7 +203,8 @@ Estas são as atualizações que estão no jogo publicado, em cima do simulador 
 - **Ambulância de insumos.** Saída aleatória do hospital do Centro para uma UPA ou um posto real, com leitos extras por três dias.
 - **Título.** O nome do jogo usa a capitular Cinzel. A marca e a fonte de outro jogo não entram no repositório.
 - **Símbolo de infecção.** O trevo vermelho fica ao lado do nome na capa e na sala. O nome da sala continua em uma linha.
-- **Aba Upgrades.** As quatro famílias de medidas saíram da vista do mapa. Encerrar o dia continua à mão.
+- **Aba Gestão.** As quatro famílias de medidas saíram da vista do mapa. Encerrar o dia continua à mão.
+- **Aba News.** Boletim, registro e novidades ficam juntos. Uma notícia nova abre um popup no estilo da sala.
 - **Publicação.** Projeto novo na Vercel, ligado a este repositório. Partidas e placar do site ficam no Blob privado. A chave do painel docente da demonstração segue `marica-sdc-2026`.
 
 ## Honestidade dos dados
