@@ -541,7 +541,7 @@ export const EVENTS: GameEvent[] = [
     category: "Vigilância",
     priority: 45,
     opening: false,
-    body: "O laboratório descreve uma linhagem da Apatia com maior adesão à pele. É a mesma doença fictícia, com taxa de contato mais alta. O nome deste boletim pode ser trocado no painel docente, sem mexer no código.",
+    body: "O laboratório descreve uma linhagem da Apatia com maior adesão à pele. É a mesma doença fictícia, com taxa de contato mais alta. O nome desta linhagem pode mudar no conteúdo, sem alterar a regra de contato.",
     lesson: "Variante muda parâmetro. A vigilância serve para perceber a mudança antes de a curva já ter mudado sozinha.",
     monthStart: null,
     monthEnd: null,

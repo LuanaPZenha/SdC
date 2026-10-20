@@ -109,7 +109,6 @@ export function Admin() {
       <h1 className="display">Painel docente</h1>
       <p className="lede">
         Políticas, eventos, parâmetros e as fórmulas de casos novos, óbitos, receita, pesquisa e pontuação ficam fora do código.
-        A chave inicial de demonstração é marica-sdc-2026. Troque ADMIN_KEY antes de publicar.
       </p>
       <p>
         <a className="text-link" href="/">

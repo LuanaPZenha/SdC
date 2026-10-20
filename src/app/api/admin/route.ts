@@ -9,11 +9,11 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 function authorized(request: Request): boolean {
-  const expected = process.env.ADMIN_KEY || "marica-sdc-2026";
+  const expected = process.env.ADMIN_KEY?.trim() ?? "";
   const got = request.headers.get("x-admin-key") ?? "";
   const left = Buffer.from(expected);
   const right = Buffer.from(got);
-  if (left.length !== right.length || left.length === 0) return false;
+  if (left.length < 12 || left.length !== right.length) return false;
   return timingSafeEqual(left, right);
 }
 

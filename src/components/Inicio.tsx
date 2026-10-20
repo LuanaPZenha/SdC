@@ -1,11 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Biohazard } from "@/components/Biohazard";
 import { STARTS } from "@/lib/starts";
-
-type Health = { storage: string; events: number; policies: number; districts: number; lessons: number };
 
 export function Inicio() {
   const router = useRouter();
@@ -13,14 +11,6 @@ export function Inicio() {
   const [startId, setStartId] = useState<string>(STARTS[0].id);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [health, setHealth] = useState<Health | null>(null);
-
-  useEffect(() => {
-    fetch("/api/health")
-      .then((response) => response.json())
-      .then((data) => setHealth(data))
-      .catch(() => setHealth(null));
-  }, []);
 
   async function start() {
     setBusy(true);
@@ -118,22 +108,13 @@ export function Inicio() {
             <a className="button secondary" href="/ranking">
               Placar
             </a>
-            <a className="button secondary" href="/admin">
-              Painel docente
-            </a>
           </div>
         </form>
         <aside className="panel">
           <h2 className="display">De onde vem o conteúdo</h2>
           <p>
-            Eventos, políticas, parâmetros e as fórmulas de contágio e de óbito ficam no banco. Um professor altera um
-            número ou inclui uma variante nova sem mexer no código. O mapa usa o contorno oficial de Maricá e divide o
-            município em oito recortes. A soma das populações segue a estimativa do IBGE para 2026, 212.703 pessoas.
-          </p>
-          <p className="storage">
-            {health
-              ? `Conteúdo ativo: ${health.storage === "postgres" ? "PostgreSQL" : health.storage === "blob" ? "arquivo na nuvem" : "arquivo local"} · ${health.events} eventos · ${health.policies} políticas · ${health.districts} recortes.`
-              : "Lendo o conteúdo…"}
+            O mapa usa o contorno oficial de Maricá e divide o município em oito recortes. A soma das populações segue
+            a estimativa do IBGE para 2026, 212.703 pessoas.
           </p>
           <p>
             Os 180 leitos iniciais são uma abstração para a aula, não o inventário real das unidades. A Apatia não existe

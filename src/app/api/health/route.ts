@@ -6,17 +6,9 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const repo = await getRepo();
-    const catalog = await repo.catalog();
-    return NextResponse.json({
-      storage: repo.mode,
-      districts: catalog.districts.length,
-      policies: catalog.policies.length,
-      events: catalog.events.length,
-      lessons: catalog.lessons.length,
-    });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Falha ao ler o conteúdo.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    await getRepo();
+    return NextResponse.json({ ok: true });
+  } catch {
+    return NextResponse.json({ ok: false }, { status: 500 });
   }
 }

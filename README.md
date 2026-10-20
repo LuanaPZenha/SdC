@@ -15,7 +15,7 @@ npm run dev
 
 Abra `http://localhost:3000`.
 
-Sem `DATABASE_URL`, o conteúdo e as partidas ficam em `data/runtime.json` na máquina local. Esse arquivo não entra no Git. Na Vercel o disco da função não guarda esse arquivo entre instâncias, então a mesma estrutura fica num Blob privado da conta. A capa mostra “arquivo local” no computador e “arquivo na nuvem” no site publicado.
+Sem `DATABASE_URL`, o conteúdo e as partidas ficam em `data/runtime.json` na máquina local. Esse arquivo não entra no Git. Na Vercel o disco da função não guarda esse arquivo entre instâncias, então a mesma estrutura fica num Blob privado da conta. A capa não informa onde os dados estão guardados.
 
 Para PostgreSQL (Neon, Supabase ou outro), copie `.env.example` para `.env.local` e preencha:
 
@@ -26,7 +26,7 @@ ADMIN_KEY=uma-chave-longa
 
 Na primeira conexão o servidor cria as tabelas de `db/schema.sql` e carrega o conteúdo. O arquivo `db/seed.sql` é a mesma carga, para quem quiser inspecionar ou aplicar à mão depois do schema. Gere de novo com `npm run export:sql` sempre que parâmetros, políticas, eventos ou lições mudarem no código.
 
-O painel docente fica em `/admin`. A chave de demonstração é `marica-sdc-2026`. Troque `ADMIN_KEY` antes de uma publicação que não seja de aula.
+A capa não leva ao editor de conteúdo. Esse editor só responde se `ADMIN_KEY` estiver definida no ambiente, com pelo menos 12 caracteres. Não há chave padrão, e ela não aparece na página.
 
 ## Telas
 
@@ -35,7 +35,6 @@ O painel docente fica em `/admin`. A chave de demonstração é `marica-sdc-2026
 | `/` | Capa. Nome no placar (2 a 24 caracteres) e uma das quatro datas de entrada. |
 | `/jogo?partida=` | Sala de situação da partida salva. |
 | `/ranking` | Placar global, até 50 gestões encerradas. |
-| `/admin` | Painel docente. Pede a chave no cabeçalho `x-admin-key`. |
 
 A capa e a sala mostram o nome **Sombras do Contágio** em capitular, com a fonte Cinzel, e o trevo de risco biológico em vermelho à esquerda do nome. O trevo é o símbolo de infecção desenhado no jogo. O restante do texto fica numa fonte de leitura.
 
@@ -185,7 +184,7 @@ Chaves de efeito usadas por políticas e escolhas:
 
 Gatilhos de evento: `calendar` dentro do mês e do dia, `random` com chance diária, `metric` (`gt`, `lt`, `gte`, `lte`) e `all` para combinar. Métricas: `day`, `occupancy`, `order`, `vaccine`, `research`, `deathsToday`, `quarantine`, `passport`, `gathering`, `infected`, `faction.comerciantes`, `faction.saude`, `faction.civil`.
 
-O painel docente edita parâmetros, fórmulas, políticas, eventos, lições, dicas e bairros. Um professor pode incluir uma variante nova com texto, gatilho e duas ou mais escolhas. A validação recusa fórmula insegura, id repetido e efeito desconhecido.
+O conteúdo editável — parâmetros, fórmulas, políticas, eventos, lições, dicas e bairros — fica fora da capa. A validação recusa fórmula insegura, id repetido e efeito desconhecido.
 
 ## Lições fixas
 
@@ -205,7 +204,7 @@ Estas são as atualizações que estão no jogo publicado, em cima do simulador 
 - **Símbolo de infecção.** O trevo vermelho fica ao lado do nome na capa e na sala. O nome da sala continua em uma linha.
 - **Aba Gestão.** As quatro famílias de medidas saíram da vista do mapa. Encerrar o dia continua à mão.
 - **Aba News.** Boletim, registro e novidades ficam juntos. Uma notícia nova abre um popup no estilo da sala.
-- **Publicação.** Projeto novo na Vercel, ligado a este repositório. Partidas e placar do site ficam no Blob privado. A chave do painel docente da demonstração segue `marica-sdc-2026`.
+- **Publicação.** Projeto novo na Vercel, ligado a este repositório. Partidas e placar do site ficam no Blob privado. A capa não mostra o editor nem chave nenhuma.
 
 ## Honestidade dos dados
 
