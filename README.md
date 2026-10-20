@@ -6,6 +6,8 @@ A Apatia é fictícia e se transmite pelo toque. Dengue, chikungunya, SRAG, sara
 
 O jogo publicado está em https://sombras-do-contagio.vercel.app. O código fica em https://github.com/LuanaPZenha/SdC. Cada envio para a branch `main` publica de novo na Vercel, no projeto `sombras-do-contagio`.
 
+A arquitetura, o motor de cada dia e o banco — tabelas, JSON e Blob — estão em [ARQUITETURA.md](ARQUITETURA.md).
+
 ## Como rodar
 
 ```bash
@@ -36,7 +38,7 @@ A capa não leva ao editor de conteúdo. Esse editor só responde se `ADMIN_KEY`
 | `/jogo?partida=` | Sala de situação da partida salva. |
 | `/ranking` | Placar global, até 50 gestões encerradas. |
 
-A capa e a sala mostram o nome **Sombras do Contágio** em capitular, com a fonte Cinzel, e o trevo de risco biológico em vermelho à esquerda do nome. O trevo é o símbolo de infecção desenhado no jogo. O restante do texto fica numa fonte de leitura.
+A capa e a sala mostram o nome **Sombras do Contágio** na serifada Cormorant Garamond, e o trevo de risco biológico em vermelho à esquerda do nome. O restante do texto usa a Outfit.
 
 Na sala, o topo traz a data (dia da semana, dia e mês, ano e o número do dia da gestão) e três medidores: fundo emergencial, ocupação hospitalar e ordem pública. A ordem pública é a média do apoio de comerciantes, profissionais de saúde e população civil.
 
