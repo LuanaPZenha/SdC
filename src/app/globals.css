@@ -201,13 +201,27 @@ textarea { min-height: 110px; resize: vertical; }
 
 .plate-head, .side-block h2, .dock-head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
 
-.atlas { width: 100%; height: auto; display: block; background: #d9e2cf; }
+.atlas { width: 100%; height: auto; display: block; background: #071018; border-radius: 2px; }
 
-.district { cursor: pointer; }
+.neighbor-land { fill: #24342e; stroke: #15211c; stroke-width: 1; }
 
-.district text { font-size: 13px; font-weight: 700; pointer-events: none; }
+.region { cursor: pointer; stroke: rgba(16, 14, 10, 0.9); stroke-width: 1.2; }
 
-.district.selected path { stroke: #1c2418; stroke-width: 3; }
+.region.selected { stroke: #f6e7c2; stroke-width: 2.8; }
+
+.lagoon { fill: #0c3042; stroke: #1c6278; stroke-width: 0.8; pointer-events: none; }
+
+.shore { fill: none; stroke: #d5e7ef; stroke-width: 1.8; pointer-events: none; }
+
+.map-label { font-size: 13px; font-weight: 700; fill: #f6f1e4; stroke: rgba(8, 10, 8, 0.82); stroke-width: 3px; paint-order: stroke fill; }
+
+.map-count { font-size: 11px; font-weight: 650; fill: #f0d7a2; }
+
+.city-dot { fill: #f7f3e8; stroke: #1a140e; stroke-width: 1; }
+
+.neighbor-label { fill: rgba(214, 224, 214, 0.55); font-size: 12px; letter-spacing: 0.04em; pointer-events: none; }
+
+.ocean-label { fill: rgba(198, 220, 228, 0.42); font-size: 12px; letter-spacing: 0.34em; pointer-events: none; }
 
 .detail { display: grid; grid-template-columns: 1.4fr repeat(4, 1fr); gap: 8px; margin-top: 10px; }
 
