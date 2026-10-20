@@ -538,44 +538,28 @@ function suspendUnaffordable(state: GameState, catalog: Catalog) {
   }
 }
 
-function weightedIndex(state: GameState, weights: number[]): number {
-  const total = weights.reduce((sum, weight) => sum + weight, 0);
-  if (total <= 0) return 0;
-  let roll = nextRandom(state) * total;
-  for (let index = 0; index < weights.length; index += 1) {
-    roll -= weights[index] ?? 0;
-    if (roll <= 0) return index;
-  }
-  return Math.max(0, weights.length - 1);
-}
-
 function carrierTrips(state: GameState, catalog: Catalog, mods: EffectBag) {
   const trips: DayReport["trips"] = [];
-  const infectedTotal = catalog.districts.reduce((sum, district) => sum + (state.districts[district.id]?.infected ?? 0), 0);
-  const limit = infectedTotal >= 180 ? 2 : 1;
-  const pool = catalog.districts.filter((district) => (state.districts[district.id]?.infected ?? 0) >= 5);
+  const pool = catalog.districts.filter((district) => (state.districts[district.id]?.infected ?? 0) >= 1);
+  for (let index = pool.length - 1; index > 0; index -= 1) {
+    const swap = Math.floor(nextRandom(state) * (index + 1));
+    const current = pool[index];
+    pool[index] = pool[swap] ?? current;
+    pool[swap] = current;
+  }
   const used = new Set<string>();
-  while (trips.length < limit && pool.length > 0) {
-    const pick = weightedIndex(
-      state,
-      pool.map((district) => state.districts[district.id]?.infected ?? 0),
-    );
-    const source = pool.splice(pick, 1)[0];
-    if (!source) break;
+  for (const source of pool) {
+    if (trips.length >= 2) break;
     const snap = state.districts[source.id];
-    if (!snap || snap.infected < 5) continue;
-    const chance = clamp(0.8 - (mods.quarantine ?? 0) * 0.5, 0.12, 0.8);
+    if (!snap || snap.infected < 1) continue;
+    const chance = clamp(0.06 + Math.min(0.08, snap.infected / 1200), 0.06, 0.14) * clamp(1 - (mods.quarantine ?? 0) * 0.65, 0.2, 1);
     if (nextRandom(state) > chance) continue;
     const options = source.neighbors
       .map((id) => catalog.districts.find((item) => item.id === id))
       .filter((item): item is Catalog["districts"][number] => Boolean(item))
       .filter((item) => !used.has(item.id));
     if (!options.length) continue;
-    const weights = options.map((item) => {
-      const there = state.districts[item.id]?.infected ?? 0;
-      return (there <= 0 ? 3.2 : 1) * (0.35 + item.border + item.tourism + item.commerce);
-    });
-    const destination = options[weightedIndex(state, weights)];
+    const destination = options[Math.floor(nextRandom(state) * options.length)];
     if (!destination) continue;
     const barrier =
       destination.border >= param(catalog, "borderMin") ? (mods.barriers ?? 0) * param(catalog, "barrierCut") : 0;
@@ -583,11 +567,10 @@ function carrierTrips(state: GameState, catalog: Catalog, mods: EffectBag) {
     const destSnap = state.districts[destination.id];
     if (!destSnap) continue;
     const room = Math.max(0, destination.population - destSnap.infected - destSnap.recovered - destSnap.dead);
-    const carried = Math.min(room, snap.infected >= 120 ? 2 : 1);
-    if (carried <= 0) continue;
-    destSnap.infected += carried;
+    if (room <= 0) continue;
+    destSnap.infected += 1;
     used.add(destination.id);
-    trips.push({ from: source.id, to: destination.id, carried });
+    trips.push({ from: source.id, to: destination.id, carried: 1 });
   }
   return trips;
 }
@@ -665,9 +648,8 @@ function resolveDay(state: GameState, catalog: Catalog) {
     const from = catalog.districts.find((item) => item.id === trip.from);
     const to = catalog.districts.find((item) => item.id === trip.to);
     if (!from || !to) continue;
-    const who = trip.carried === 1 ? "1 pessoa contaminada" : `${trip.carried} pessoas contaminadas`;
-    notes.push(`Um ônibus saiu de ${from.name} para ${to.name} com ${who}. O contato entrou no destino.`);
-    pushLog(state, `Ônibus de ${from.name} para ${to.name}: ${trip.carried} caso(s) levado(s).`);
+    notes.push(`Alguém contaminado saiu de ${from.name} e foi de ônibus até ${to.name}. O caso entrou no destino.`);
+    pushLog(state, `Alguém contaminado saiu de ${from.name} para ${to.name}.`);
     newInfections += trip.carried;
   }
 
