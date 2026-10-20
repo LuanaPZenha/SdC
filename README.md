@@ -204,6 +204,7 @@ Estas são as atualizações que estão no jogo publicado, em cima do simulador 
 - **Símbolo de infecção.** O trevo vermelho fica ao lado do nome na capa e na sala. O nome da sala continua em uma linha.
 - **Aba Gestão.** As quatro famílias de medidas saíram da vista do mapa. Encerrar o dia continua à mão.
 - **Aba News.** Boletim, registro e novidades ficam juntos. Uma notícia nova abre um popup no estilo da sala.
+- **Ícones das abas.** Sala é o mapa-múndi, Gestão é a prancheta com a engrenagem e News é o jornal.
 - **Publicação.** Projeto novo na Vercel, ligado a este repositório. Partidas e placar do site ficam no Blob privado. A capa não mostra o editor nem chave nenhuma.
 
 ## Honestidade dos dados

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Biohazard } from "@/components/Biohazard";
+import { GestaoIcon, NewsIcon, SalaIcon } from "@/components/TabIcons";
 import { Mapa } from "@/components/Mapa";
 import { addDays, dateParts, formatDayMonth, money, people } from "@/lib/format";
 import type { GameView, PolicyView } from "@/lib/types";
@@ -168,21 +169,31 @@ export function Sala() {
       </header>
       <nav className="views" aria-label="Painéis da sala">
         <div className="tabs" role="tablist">
-          <button className={panel === "sala" ? "tab on" : "tab"} type="button" onClick={() => setPanel("sala")}>
-            Sala
-          </button>
-          <button className={panel === "gestao" ? "tab on" : "tab"} type="button" onClick={() => setPanel("gestao")}>
-            Gestão{activeUpgrades > 0 ? ` · ${activeUpgrades}` : ""}
+          <button className={panel === "sala" ? "tab icon-tab on" : "tab icon-tab"} type="button" aria-label="Sala" title="Sala" onClick={() => setPanel("sala")}>
+            <SalaIcon />
           </button>
           <button
-            className={panel === "news" ? "tab on" : "tab"}
+            className={panel === "gestao" ? "tab icon-tab on" : "tab icon-tab"}
             type="button"
+            aria-label={activeUpgrades > 0 ? `Gestão, ${activeUpgrades} ativas` : "Gestão"}
+            title="Gestão"
+            onClick={() => setPanel("gestao")}
+          >
+            <GestaoIcon />
+            {activeUpgrades > 0 ? <span className="tab-badge">{activeUpgrades}</span> : null}
+          </button>
+          <button
+            className={panel === "news" ? "tab icon-tab on" : "tab icon-tab"}
+            type="button"
+            aria-label={unread ? "News, novidade" : "News"}
+            title="News"
             onClick={() => {
               setPanel("news");
               setUnread(false);
             }}
           >
-            News{unread ? " · novo" : ""}
+            <NewsIcon />
+            {unread ? <span className="tab-badge">novo</span> : null}
           </button>
         </div>
         <button className="end-day" type="button" disabled={busy || view.status !== "playing" || Boolean(view.pending)} onClick={() => void act({ action: "end" })}>
