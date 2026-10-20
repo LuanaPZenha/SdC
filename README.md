@@ -80,6 +80,9 @@ Gatilhos de evento: `calendar` dentro do mês e do dia, `random` com chance diá
 
 Autores: 
 Amanda Nick - Líder do Projeto
+
 Bruno Barral - FullStack
+
 Luana Zenha - Full Stack
+
 Renan Monteiro - Análise e Requisitos
