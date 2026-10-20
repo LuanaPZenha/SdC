@@ -13,10 +13,27 @@ const MONTHS = [
   "dezembro",
 ];
 
-export function formatDate(iso: string): string {
+const WEEKDAYS = ["domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"];
+
+export function dateParts(iso: string) {
   const [year, month, day] = iso.split("-").map(Number);
-  const name = MONTHS[(month ?? 1) - 1] ?? "";
-  return `${day} de ${name} de ${year}`;
+  const utc = new Date(`${iso}T12:00:00Z`);
+  return {
+    year: year ?? 2026,
+    day: day ?? 1,
+    month: MONTHS[(month ?? 1) - 1] ?? "",
+    weekday: WEEKDAYS[utc.getUTCDay()] ?? "",
+  };
+}
+
+export function formatDate(iso: string): string {
+  const parts = dateParts(iso);
+  return `${parts.weekday}, ${parts.day} de ${parts.month} de ${parts.year}`;
+}
+
+export function formatDayMonth(iso: string): string {
+  const parts = dateParts(iso);
+  return `${parts.day} de ${parts.month}`;
 }
 
 export function money(value: number): string {
