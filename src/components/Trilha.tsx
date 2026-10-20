@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 const KEY = "sdc-trilha";
-const VOLUME = 0.16;
+const VOLUME = 0.42;
 
 export function Trilha() {
   const audio = useRef<HTMLAudioElement>(null);
@@ -26,9 +26,7 @@ export function Trilha() {
       void el.play().catch(() => undefined);
     };
 
-    if (on) start();
-    else el.pause();
-
+    if (!on) el.pause();
     window.addEventListener("pointerdown", start);
     window.addEventListener("keydown", start);
     return () => {
@@ -38,23 +36,28 @@ export function Trilha() {
   }, [on, ready]);
 
   function toggle() {
-    const next = !on;
-    setOn(next);
-    window.localStorage.setItem(KEY, next ? "on" : "off");
     const el = audio.current;
     if (!el) return;
-    if (next) void el.play().catch(() => undefined);
-    else el.pause();
+    if (!el.paused) {
+      setOn(false);
+      window.localStorage.setItem(KEY, "off");
+      el.pause();
+      return;
+    }
+    setOn(true);
+    window.localStorage.setItem(KEY, "on");
+    void el.play().catch(() => undefined);
   }
 
   return (
     <div className="trilha-mount">
-      <audio ref={audio} src="/trilha.mp3" loop preload="auto" />
+      <audio ref={audio} src="/trilha.mp3?v=2" loop preload="auto" playsInline />
       <button
         className={on ? "trilha on" : "trilha"}
         type="button"
         aria-pressed={on}
         aria-label={on ? "Silenciar a trilha" : "Ouvir a trilha"}
+        onPointerDown={(event) => event.stopPropagation()}
         onClick={toggle}
       >
         {on ? "Som" : "Mudo"}
