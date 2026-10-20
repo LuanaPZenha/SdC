@@ -24,7 +24,7 @@ O painel docente fica em `/admin`. A chave de demonstração é `marica-sdc-2026
 
 ## Como jogar
 
-Cada clique em encerrar o dia avança exatamente uma data do calendário, de 1º de fevereiro para 2 de fevereiro e assim por diante. A maior parte dos dias passa em silêncio. Carnaval, aniversário da cidade, festa do Amparo, Natal e as ondas de dengue ou SRAG só abrem boletim dentro da janela real daquele mês. De manhã pode haver um boletim; a resposta muda verba, contato, leitos ou confiança. No painel inferior estão as quatro famílias de medida: políticas de saúde, controle de fronteiras, pesquisa e gestão de facções. Encerrar o dia aplica a receita, o contágio, os óbitos e o avanço da cura.
+Cada clique em encerrar o dia avança exatamente uma data do calendário, de 1º de fevereiro para 2 de fevereiro e assim por diante. Quando um recorte já tem casos, pode sair um ônibus vermelho até um bairro vizinho. A viagem deixa esses casos no destino e o índice de lá começa a subir. A maior parte dos dias passa em silêncio. Carnaval, aniversário da cidade, festa do Amparo, Natal e as ondas de dengue ou SRAG só abrem boletim dentro da janela real daquele mês. De manhã pode haver um boletim; a resposta muda verba, contato, leitos ou confiança. No painel inferior estão as quatro famílias de medida: políticas de saúde, controle de fronteiras, pesquisa e gestão de facções. Encerrar o dia aplica a receita, o contágio, os óbitos e o avanço da cura.
 
 A gestão cai se a ocupação passar de 100% por dias seguidos, se a ordem pública romper ou se os óbitos passarem do teto. A cura encerra a crise. O placar ordena pelos dias sobrevividos.
 
