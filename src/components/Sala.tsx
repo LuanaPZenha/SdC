@@ -30,6 +30,7 @@ export function Sala() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [missing, setMissing] = useState(false);
+  const [panel, setPanel] = useState<"sala" | "upgrades">("sala");
   const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("saude");
   const [selected, setSelected] = useState("centro");
   const [codex, setCodex] = useState(false);
@@ -77,6 +78,7 @@ export function Sala() {
   if (!view || !district) return <p className="loading">Abrindo a sala de situação…</p>;
 
   const policies = view.policies.filter((policy) => policy.category === tab);
+  const activeUpgrades = view.policies.filter((policy) => policy.active).length;
 
   return (
     <div className="room" id="conteudo">
@@ -99,6 +101,20 @@ export function Sala() {
           <Meter label="Ordem pública" value={`${Math.round(view.order)}`} width={view.order} bad={view.order < 40} hint="Comércio, equipes e população" />
         </div>
       </header>
+      <nav className="views" aria-label="Painéis da sala">
+        <div className="tabs" role="tablist">
+          <button className={panel === "sala" ? "tab on" : "tab"} type="button" onClick={() => setPanel("sala")}>
+            Sala
+          </button>
+          <button className={panel === "upgrades" ? "tab on" : "tab"} type="button" onClick={() => setPanel("upgrades")}>
+            Upgrades{activeUpgrades > 0 ? ` · ${activeUpgrades}` : ""}
+          </button>
+        </div>
+        <button className="end-day" type="button" disabled={busy || view.status !== "playing" || Boolean(view.pending)} onClick={() => void act({ action: "end" })}>
+          {busy ? "Registrando…" : `Encerrar ${formatDayMonth(view.date)}`}
+        </button>
+      </nav>
+      {panel === "sala" ? (
       <div className="war">
         <section className="plate">
           <div className="plate-head">
@@ -208,25 +224,26 @@ export function Sala() {
           ) : null}
         </aside>
       </div>
-      <footer className="dock">
-        <div className="tabs" role="tablist">
+      ) : (
+      <section className="upgrades" id="upgrades">
+        <div className="plate-head">
+          <h2 className="display">Upgrades</h2>
+          <span>Medidas da gestão. Cada uma altera verba, contato, leitos ou confiança.</span>
+        </div>
+        <div className="tabs" role="tablist" aria-label="Famílias de upgrade">
           {TABS.map((item) => (
             <button key={item.id} className={item.id === tab ? "tab on" : "tab"} type="button" onClick={() => setTab(item.id)}>
               {item.label}
             </button>
           ))}
         </div>
-        <div className="dock-grid">
-          <div className="cards">
-            {policies.map((policy) => (
-              <PolicyCard key={policy.id} policy={policy} busy={busy || view.status !== "playing"} onAct={act} />
-            ))}
-          </div>
-          <button className="end-day" type="button" disabled={busy || view.status !== "playing" || Boolean(view.pending)} onClick={() => void act({ action: "end" })}>
-            {busy ? "Registrando…" : `Encerrar ${formatDayMonth(view.date)}`}
-          </button>
+        <div className="cards">
+          {policies.map((policy) => (
+            <PolicyCard key={policy.id} policy={policy} busy={busy || view.status !== "playing"} onAct={act} />
+          ))}
         </div>
-      </footer>
+      </section>
+      )}
       {view.pending && view.status === "playing" ? (
         <div className="overlay">
           <section className="dossier" role="dialog" aria-modal="true" aria-labelledby="boletim-titulo">
