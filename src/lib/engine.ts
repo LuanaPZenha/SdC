@@ -657,7 +657,7 @@ function resolveDay(state: GameState, catalog: Catalog) {
   state.history = state.history.slice(-180);
   pushLog(
     state,
-    `Dia encerrado: ${newInfections.toLocaleString("pt-BR")} casos novos, ${state.deathsToday.toLocaleString("pt-BR")} óbitos, pesquisa em ${state.research.toFixed(1).replace(".", ",") }%.`,
+    `${newInfections.toLocaleString("pt-BR")} casos novos, ${state.deathsToday.toLocaleString("pt-BR")} óbitos, pesquisa em ${state.research.toFixed(1).replace(".", ",")}%.`,
   );
   conclude(state, catalog, endView.occupancy);
   if (state.status !== "playing") return;
