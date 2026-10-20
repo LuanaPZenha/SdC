@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Mapa } from "@/components/Mapa";
-import { money, people } from "@/lib/format";
+import { addDays, dateParts, formatDayMonth, money, people } from "@/lib/format";
 import type { GameView, PolicyView } from "@/lib/types";
 
 const TABS = [
@@ -90,8 +90,9 @@ export function Sala() {
         </div>
         <div className="gauges">
           <div className="date-block">
-            <span>Dia {view.day}</span>
-            <strong className="display">{view.dateLabel}</strong>
+            <span>{dateParts(view.date).weekday}</span>
+            <strong className="display">{formatDayMonth(view.date)}</strong>
+            <span className="when">{dateParts(view.date).year} · dia {view.day} da gestão</span>
           </div>
           <Meter label="Fundo emergencial" value={`R$ ${money(view.budget)} mi`} width={Math.min(100, (view.budget / 30) * 100)} hint={`Receita prevista ${money(view.income)} · manutenção ${money(view.upkeep)}`} />
           <Meter label="Ocupação hospitalar" value={`${Math.round(view.occupancy * 100)}%`} width={Math.min(100, view.occupancy * 100)} bad={view.occupancy > 0.85} hint={`${Math.round(view.apatiaBeds)} leitos da Apatia · ${Math.round(view.parallelBeds)} de outras síndromes · ${Math.round(view.capacity)} vagas`} />
@@ -146,7 +147,7 @@ export function Sala() {
             ))}
           </section>
           <section className="side-block">
-            <h2 className="display">Boletim da noite</h2>
+            <h2 className="display">{view.report ? `Boletim de ${formatDayMonth(view.report.date)}` : "Boletim da noite"}</h2>
             {view.report ? (
               <>
                 <p>
@@ -186,7 +187,7 @@ export function Sala() {
             <ul className="log">
               {view.log.slice(0, 8).map((entry, index) => (
                 <li key={`${entry.day}-${index}`}>
-                  Dia {entry.day}. {entry.text}
+                  {formatDayMonth(addDays(view.date, entry.day - view.day))}. {entry.text}
                 </li>
               ))}
             </ul>
@@ -216,7 +217,7 @@ export function Sala() {
             ))}
           </div>
           <button className="end-day" type="button" disabled={busy || view.status !== "playing" || Boolean(view.pending)} onClick={() => void act({ action: "end" })}>
-            {busy ? "Registrando…" : "Encerrar o dia"}
+            {busy ? "Registrando…" : `Encerrar ${formatDayMonth(view.date)}`}
           </button>
         </div>
       </footer>

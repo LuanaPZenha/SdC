@@ -187,6 +187,8 @@ textarea { min-height: 110px; resize: vertical; }
 
 .gauge strong, .date-block strong, .stat strong { font-size: 1.25rem; }
 
+.date-block .when { text-transform: none; letter-spacing: 0; }
+
 .bar { height: 7px; background: rgba(255, 255, 255, 0.12); margin-top: 6px; }
 
 .bar i { display: block; height: 100%; background: var(--brass); }
