@@ -87,7 +87,15 @@ h1, h2, h3, p { margin-top: 0; }
   margin: 8px 0 12px;
 }
 
-.home h1.game-title { font-weight: 900; }
+.home h1.game-title {
+  font-weight: 900;
+  flex-wrap: nowrap;
+  font-size: clamp(1.05rem, 4.5vw, 3.85rem);
+  line-height: 1;
+  letter-spacing: 0.045em;
+}
+
+.home h1.game-title span { white-space: nowrap; }
 
 .lede { max-width: 68ch; color: #efe6d6; font-size: 1.05rem; }
 
