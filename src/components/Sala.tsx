@@ -105,7 +105,13 @@ export function Sala() {
             <h2 className="display">Maricá</h2>
             <span>{people(view.infected)} infectados · {people(view.dead)} óbitos da crise · pesquisa {view.research.toFixed(1).replace(".", ",")}%</span>
           </div>
-          <Mapa districts={view.districts} selected={district.id} onSelect={setSelected} trips={view.report?.trips ?? []} />
+          <Mapa
+            districts={view.districts}
+            selected={district.id}
+            onSelect={setSelected}
+            trips={view.report?.trips ?? []}
+            supplyRuns={view.report?.supplyRuns ?? []}
+          />
           <div className="detail">
             <div className="stat">
               <span>{district.officialDistrict}</span>

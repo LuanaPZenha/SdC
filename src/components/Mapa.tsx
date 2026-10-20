@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { CarrierTrip, DistrictView } from "@/lib/types";
+import type { CarrierTrip, DistrictView, SupplyRun } from "@/lib/types";
 import { people } from "@/lib/format";
 import { LAGOON_PATH, MAP_VIEW, MUNICIPALITY_PATH, NEIGHBOR_LANDS, REGION_SHAPES } from "@/content/geography";
 
@@ -37,13 +37,13 @@ function stopOf(id: string): { x: number; y: number; name: string } | null {
   return { x: shape.labelX + shift.x, y: shape.labelY + shift.y - 16, name: shape.name };
 }
 
-function routePath(from: { x: number; y: number }, to: { x: number; y: number }): string {
+function routePath(from: { x: number; y: number }, to: { x: number; y: number }, bendSign = 1): string {
   const midX = (from.x + to.x) / 2;
   const midY = (from.y + to.y) / 2;
   const dx = to.x - from.x;
   const dy = to.y - from.y;
   const length = Math.hypot(dx, dy) || 1;
-  const bend = Math.min(42, length * 0.18);
+  const bend = Math.min(42, length * 0.18) * bendSign;
   return `M ${from.x} ${from.y} Q ${midX + (-dy / length) * bend} ${midY + (dx / length) * bend} ${to.x} ${to.y}`;
 }
 
@@ -90,16 +90,61 @@ function Bus({ trip, index, motion }: { trip: CarrierTrip; index: number; motion
   );
 }
 
+function Ambulance({ run, index, motion }: { run: SupplyRun; index: number; motion: boolean }) {
+  const from = stopOf(run.from);
+  const to = stopOf(run.to);
+  if (!from || !to) return null;
+  const pathId = `sdc-ambulance-${index}-${run.from}-${run.to}`;
+  const duration = 4;
+  return (
+    <g className="ambulance-run" pointerEvents="none">
+      <title>{`Ambulância do ${run.originName} para ${run.phrase}`}</title>
+      <path id={pathId} className="ambulance-route" d={routePath(from, to, -1)} />
+      <g>
+        {motion ? (
+          <animateMotion dur={`${duration}s`} rotate="auto" fill="freeze" repeatCount="1">
+            <mpath href={`#${pathId}`} />
+          </animateMotion>
+        ) : (
+          <animateMotion dur="0.01s" rotate="auto" fill="freeze" repeatCount="1">
+            <mpath href={`#${pathId}`} />
+          </animateMotion>
+        )}
+        <g className="ambulance" transform="scale(1.85)">
+          <rect className="ambulance-body" x={-12} y={-4.4} width={21} height={8} rx={1.4} />
+          <path className="ambulance-cabin" d="M-4 -4.4 H6.5 L8.4 -8 H-2.4 Z" />
+          <rect className="ambulance-window" x={-1.2} y={-7.3} width={2.4} height={2.2} />
+          <rect className="ambulance-window" x={2} y={-7.3} width={2.4} height={2.2} />
+          <rect className="ambulance-cross" x={-9.2} y={-2.5} width={1.5} height={4.2} />
+          <rect className="ambulance-cross" x={-10.6} y={-1.15} width={4.3} height={1.5} />
+          <circle className="ambulance-wheel" cx={-6} cy={3.8} r={1.7} />
+          <circle className="ambulance-wheel" cx={5.6} cy={3.8} r={1.7} />
+        </g>
+      </g>
+      <circle className="arrival-care" cx={to.x} cy={to.y} r={4} opacity={0}>
+        {motion ? (
+          <>
+            <animate attributeName="r" from="3" to="18" dur="0.9s" begin={`${duration}s`} fill="freeze" />
+            <animate attributeName="opacity" from="0.95" to="0" dur="0.9s" begin={`${duration}s`} fill="freeze" />
+          </>
+        ) : null}
+      </circle>
+    </g>
+  );
+}
+
 export function Mapa({
   districts,
   selected,
   onSelect,
   trips = [],
+  supplyRuns = [],
 }: {
   districts: DistrictView[];
   selected: string;
   onSelect: (id: string) => void;
   trips?: CarrierTrip[];
+  supplyRuns?: SupplyRun[];
 }) {
   const [motion, setMotion] = useState(true);
   useEffect(() => {
@@ -192,6 +237,9 @@ export function Mapa({
       })}
       {trips.map((trip, index) => (
         <Bus key={`${trip.from}-${trip.to}-${index}`} trip={trip} index={index} motion={motion} />
+      ))}
+      {supplyRuns.map((run, index) => (
+        <Ambulance key={`${run.to}-${run.destinationName}-${index}`} run={run} index={index} motion={motion} />
       ))}
       <text className="ocean-label" x={MAP_VIEW.width / 2} y={MAP_VIEW.height - 16} textAnchor="middle">
         OCEANO ATLÂNTICO

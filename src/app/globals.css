@@ -247,8 +247,30 @@ textarea { min-height: 110px; resize: vertical; }
 
 @keyframes bus-dash { to { stroke-dashoffset: -40; } }
 
+.ambulance-route {
+  fill: none;
+  stroke: #e7f6ff;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 6 6;
+  opacity: 0.95;
+  animation: bus-dash 0.8s linear infinite;
+}
+
+.ambulance-body { fill: #f7f4ee; stroke: #2a211c; stroke-width: 0.7; }
+
+.ambulance-cabin { fill: #f7f4ee; stroke: #2a211c; stroke-width: 0.45; }
+
+.ambulance-window { fill: #9fd0ea; }
+
+.ambulance-cross { fill: #d61f18; }
+
+.ambulance-wheel { fill: #140e0c; }
+
+.arrival-care { fill: none; stroke: #d7f3ff; stroke-width: 1.7; }
+
 @media (prefers-reduced-motion: reduce) {
-  .bus-route { animation: none; }
+  .bus-route, .ambulance-route { animation: none; }
 }
 
 .detail { display: grid; grid-template-columns: 1.4fr repeat(4, 1fr); gap: 8px; margin-top: 10px; }
