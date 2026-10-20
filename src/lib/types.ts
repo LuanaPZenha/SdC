@@ -178,6 +178,12 @@ export type TimedModifier = {
   effects: EffectBag;
 };
 
+export type CarrierTrip = {
+  from: string;
+  to: string;
+  carried: number;
+};
+
 export type DayReport = {
   day: number;
   date: string;
@@ -189,6 +195,7 @@ export type DayReport = {
   researchGain: number;
   occupancy: number;
   notes: string[];
+  trips: CarrierTrip[];
 };
 
 export type CodexEntry = {

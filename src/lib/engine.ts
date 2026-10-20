@@ -538,6 +538,60 @@ function suspendUnaffordable(state: GameState, catalog: Catalog) {
   }
 }
 
+function weightedIndex(state: GameState, weights: number[]): number {
+  const total = weights.reduce((sum, weight) => sum + weight, 0);
+  if (total <= 0) return 0;
+  let roll = nextRandom(state) * total;
+  for (let index = 0; index < weights.length; index += 1) {
+    roll -= weights[index] ?? 0;
+    if (roll <= 0) return index;
+  }
+  return Math.max(0, weights.length - 1);
+}
+
+function carrierTrips(state: GameState, catalog: Catalog, mods: EffectBag) {
+  const trips: DayReport["trips"] = [];
+  const infectedTotal = catalog.districts.reduce((sum, district) => sum + (state.districts[district.id]?.infected ?? 0), 0);
+  const limit = infectedTotal >= 180 ? 2 : 1;
+  const pool = catalog.districts.filter((district) => (state.districts[district.id]?.infected ?? 0) >= 5);
+  const used = new Set<string>();
+  while (trips.length < limit && pool.length > 0) {
+    const pick = weightedIndex(
+      state,
+      pool.map((district) => state.districts[district.id]?.infected ?? 0),
+    );
+    const source = pool.splice(pick, 1)[0];
+    if (!source) break;
+    const snap = state.districts[source.id];
+    if (!snap || snap.infected < 5) continue;
+    const chance = clamp(0.8 - (mods.quarantine ?? 0) * 0.5, 0.12, 0.8);
+    if (nextRandom(state) > chance) continue;
+    const options = source.neighbors
+      .map((id) => catalog.districts.find((item) => item.id === id))
+      .filter((item): item is Catalog["districts"][number] => Boolean(item))
+      .filter((item) => !used.has(item.id));
+    if (!options.length) continue;
+    const weights = options.map((item) => {
+      const there = state.districts[item.id]?.infected ?? 0;
+      return (there <= 0 ? 3.2 : 1) * (0.35 + item.border + item.tourism + item.commerce);
+    });
+    const destination = options[weightedIndex(state, weights)];
+    if (!destination) continue;
+    const barrier =
+      destination.border >= param(catalog, "borderMin") ? (mods.barriers ?? 0) * param(catalog, "barrierCut") : 0;
+    if (barrier > 0 && nextRandom(state) < barrier) continue;
+    const destSnap = state.districts[destination.id];
+    if (!destSnap) continue;
+    const room = Math.max(0, destination.population - destSnap.infected - destSnap.recovered - destSnap.dead);
+    const carried = Math.min(room, snap.infected >= 120 ? 2 : 1);
+    if (carried <= 0) continue;
+    destSnap.infected += carried;
+    used.add(destination.id);
+    trips.push({ from: source.id, to: destination.id, carried });
+  }
+  return trips;
+}
+
 function resolveDay(state: GameState, catalog: Catalog) {
   suspendUnaffordable(state, catalog);
   const before = project(state, catalog);
@@ -606,6 +660,17 @@ function resolveDay(state: GameState, catalog: Catalog) {
   state.deathsToday = assigned + excess;
   if (excess > 0) notes.push("Houve óbitos em excesso ligados à falta de leito, não só à história natural da Apatia.");
 
+  const trips = carrierTrips(state, catalog, mods);
+  for (const trip of trips) {
+    const from = catalog.districts.find((item) => item.id === trip.from);
+    const to = catalog.districts.find((item) => item.id === trip.to);
+    if (!from || !to) continue;
+    const who = trip.carried === 1 ? "1 pessoa contaminada" : `${trip.carried} pessoas contaminadas`;
+    notes.push(`Um ônibus saiu de ${from.name} para ${to.name} com ${who}. O contato entrou no destino.`);
+    pushLog(state, `Ônibus de ${from.name} para ${to.name}: ${trip.carried} caso(s) levado(s).`);
+    newInfections += trip.carried;
+  }
+
   for (const faction of catalog.factions) {
     let delta = mods.factionsDaily?.[faction.id] ?? 0;
     if (faction.id === "saude") {
@@ -644,6 +709,7 @@ function resolveDay(state: GameState, catalog: Catalog) {
     researchGain: round1(researchGain),
     occupancy: endView.occupancy,
     notes,
+    trips,
   };
   state.lastReport = report;
   state.history.push({
@@ -752,7 +818,7 @@ export function buildView(state: GameState, catalog: Catalog): GameView {
         }
       : null,
     lastOutcome: state.lastOutcome,
-    report: state.lastReport,
+    report: state.lastReport ? { ...state.lastReport, trips: state.lastReport.trips ?? [] } : null,
     log: state.log,
     modifiers: state.timedModifiers.map((modifier) => ({ name: modifier.name, daysLeft: modifier.daysLeft })),
     history: state.history,
