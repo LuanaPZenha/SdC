@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-Abra `http://localhost:3000`. Sem `DATABASE_URL`, o conteúdo e as partidas ficam em `data/runtime.json`. Para PostgreSQL (Neon, Supabase ou outro), copie `.env.example` para `.env.local` e preencha:
+Abra `http://localhost:3000`. O jogo publicado está em https://sombras-do-contagio.vercel.app. Sem `DATABASE_URL`, o conteúdo e as partidas ficam em `data/runtime.json` na máquina local. Na Vercel, o mesmo arquivo fica num Blob privado, para a partida e o placar não sumirem quando a instância troca. Para PostgreSQL (Neon, Supabase ou outro), copie `.env.example` para `.env.local` e preencha:
 
 ```bash
 DATABASE_URL=postgresql://usuario:senha@host/banco?sslmode=require

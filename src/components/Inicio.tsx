@@ -132,7 +132,7 @@ export function Inicio() {
           </p>
           <p className="storage">
             {health
-              ? `Conteúdo ativo: ${health.storage === "postgres" ? "PostgreSQL" : "arquivo local"} · ${health.events} eventos · ${health.policies} políticas · ${health.districts} recortes.`
+              ? `Conteúdo ativo: ${health.storage === "postgres" ? "PostgreSQL" : health.storage === "blob" ? "arquivo na nuvem" : "arquivo local"} · ${health.events} eventos · ${health.policies} políticas · ${health.districts} recortes.`
               : "Lendo o conteúdo…"}
           </p>
           <p>

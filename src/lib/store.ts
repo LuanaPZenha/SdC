@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { mkdir, readFile, writeFile } from "fs/promises";
 import path from "path";
+import { get, put } from "@vercel/blob";
 import { Pool, type PoolClient } from "pg";
 import { seedCatalog } from "@/content";
 import type { Catalog, GameState, RankingEntry } from "@/lib/types";
@@ -13,7 +14,7 @@ type FileShape = {
 };
 
 export type Repo = {
-  mode: "postgres" | "arquivo";
+  mode: "postgres" | "arquivo" | "blob";
   catalog: () => Promise<Catalog>;
   saveCatalog: (catalog: Catalog) => Promise<void>;
   game: (id: string) => Promise<GameState | null>;
@@ -23,6 +24,11 @@ export type Repo = {
 };
 
 const filePath = path.join(process.cwd(), "data", "runtime.json");
+const blobPath = "runtime.json";
+
+function blobEnabled() {
+  return Boolean(process.env.VERCEL && process.env.BLOB_READ_WRITE_TOKEN);
+}
 let queue: Promise<unknown> = Promise.resolve();
 let repoPromise: Promise<Repo> | null = null;
 
@@ -35,7 +41,32 @@ function locked<T>(work: () => Promise<T>): Promise<T> {
   return run;
 }
 
+async function readBlobDb(): Promise<FileShape> {
+  const result = await get(blobPath, { access: "private", useCache: false });
+  if (!result || result.statusCode !== 200) {
+    const fresh: FileShape = { catalog: seedCatalog(), games: {}, ranking: [] };
+    await writeBlobDb(fresh);
+    return fresh;
+  }
+  const raw = await new Response(result.stream).text();
+  const parsed = JSON.parse(raw) as FileShape;
+  const errors = validateCatalog(parsed.catalog);
+  if (errors.length) throw new Error(errors.join(" "));
+  return parsed;
+}
+
+async function writeBlobDb(data: FileShape) {
+  await put(blobPath, JSON.stringify(data), {
+    access: "private",
+    addRandomSuffix: false,
+    allowOverwrite: true,
+    contentType: "application/json",
+    cacheControlMaxAge: 60,
+  });
+}
+
 async function readFileDb(): Promise<FileShape> {
+  if (blobEnabled()) return readBlobDb();
   try {
     const raw = await readFile(filePath, "utf8");
     const parsed = JSON.parse(raw) as FileShape;
@@ -53,13 +84,17 @@ async function readFileDb(): Promise<FileShape> {
 }
 
 async function writeFileDb(data: FileShape) {
+  if (blobEnabled()) {
+    await writeBlobDb(data);
+    return;
+  }
   await mkdir(path.dirname(filePath), { recursive: true });
   await writeFile(filePath, JSON.stringify(data), "utf8");
 }
 
 function fileRepo(): Repo {
   return {
-    mode: "arquivo",
+    mode: blobEnabled() ? "blob" : "arquivo",
     async catalog() {
       return locked(async () => structuredClone((await readFileDb()).catalog));
     },
