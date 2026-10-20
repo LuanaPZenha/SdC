@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { Biohazard } from "@/components/Biohazard";
 import { Mapa } from "@/components/Mapa";
 import { addDays, dateParts, formatDayMonth, money, people } from "@/lib/format";
 import type { GameView, PolicyView } from "@/lib/types";
@@ -86,7 +87,8 @@ export function Sala() {
         <div className="brand">
           <span className="kicker">Sala de situação</span>
           <a className="display game-title" href="/">
-            Sombras do Contágio
+            <Biohazard />
+            <span>Sombras do Contágio</span>
           </a>
           <span>{view.playerName}</span>
         </div>

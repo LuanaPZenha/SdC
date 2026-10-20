@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Biohazard } from "@/components/Biohazard";
 import { STARTS } from "@/lib/starts";
 
 type Health = { storage: string; events: number; policies: number; districts: number; lessons: number };
@@ -46,7 +47,10 @@ export function Inicio() {
   return (
     <main className="home" id="conteudo">
       <p className="kicker">Secretaria Municipal de Saúde · Maricá/RJ</p>
-      <h1 className="display game-title">Sombras do Contágio</h1>
+      <h1 className="display game-title">
+        <Biohazard />
+        <span>Sombras do Contágio</span>
+      </h1>
       <p className="lede">
         Você assume a gestão da saúde pública enquanto a Apatia, uma condição fictícia transmitida pelo toque, se espalha
         pelos recortes da cidade. O trabalho é segurar a rede, a adesão e a pesquisa até a cura. Dengue, sarampo, pólio,
