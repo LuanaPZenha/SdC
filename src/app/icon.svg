@@ -1,5 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="3" fill="#101816"/>
-  <path d="M5 23c4-10 7-15 11-15s7 5 11 15" fill="none" stroke="#f3e7d1" stroke-width="2"/>
-  <circle cx="16" cy="13" r="2.5" fill="#a3472b"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -100 200 200">
+  <rect x="-100" y="-100" width="200" height="200" fill="#101816"/>
+  <defs>
+    <mask id="sdc-bio">
+      <rect x="-100" y="-100" width="200" height="200" fill="black"/>
+      <g fill="white">
+        <circle cx="0" cy="-34" r="48"/>
+        <circle cx="29.4" cy="17" r="48"/>
+        <circle cx="-29.4" cy="17" r="48"/>
+      </g>
+      <g fill="black">
+        <circle cx="0" cy="0" r="16"/>
+        <circle cx="0" cy="-55" r="19"/>
+        <circle cx="47.6" cy="27.5" r="19"/>
+        <circle cx="-47.6" cy="27.5" r="19"/>
+        <circle cx="0" cy="46" r="30"/>
+        <circle cx="39.8" cy="-23" r="30"/>
+        <circle cx="-39.8" cy="-23" r="30"/>
+      </g>
+      <circle cx="0" cy="0" r="6.2" fill="white"/>
+      <circle cx="0" cy="0" r="11.5" fill="none" stroke="white" stroke-width="3.2"/>
+    </mask>
+  </defs>
+  <rect x="-100" y="-100" width="200" height="200" fill="#d61f18" mask="url(#sdc-bio)"/>
 </svg>
