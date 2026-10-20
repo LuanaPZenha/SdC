@@ -1,15 +1,15 @@
 import type { Parameter } from "@/lib/types";
 
 export const PARAMETERS: Parameter[] = [
-  { key: "beta", value: 0.27, label: "Taxa de contato da Apatia", hint: "Força de infecção diária quando o fator de circulação é 1. A Apatia passa por toque." },
+  { key: "beta", value: 0.12, label: "Taxa de contato da Apatia", hint: "Força de infecção diária quando o fator de circulação é 1. A Apatia passa por toque. O valor deixa a curva crescer ao longo de semanas." },
   { key: "recovery", value: 0.11, label: "Recuperação diária", hint: "Fração dos infectados que deixa de transmitir a cada dia." },
-  { key: "severeRate", value: 0.055, label: "Taxa de gravidade", hint: "Fração dos infectados que precisa de leito." },
+  { key: "severeRate", value: 0.038, label: "Taxa de gravidade", hint: "Fração dos infectados que precisa de leito." },
   { key: "elderlySevere", value: 0.85, label: "Peso da idade na gravidade", hint: "Quanto a proporção de idosos do bairro aumenta a necessidade de leito." },
   { key: "baseLethality", value: 0.012, label: "Letalidade dos tratados", hint: "Óbitos por dia entre doentes da Apatia que conseguiram leito." },
   { key: "overloadLethality", value: 0.07, label: "Letalidade sem leito", hint: "Óbitos por dia entre quem ficou fora da capacidade." },
-  { key: "baseIncome", value: 5, label: "Receita diária", hint: "Entrada do fundo emergencial em milhões de reais fictícios, sem restrição de circulação." },
+  { key: "baseIncome", value: 7.5, label: "Receita diária", hint: "Entrada do fundo emergencial em milhões de reais fictícios, sem restrição de circulação. Cobre pesquisa e uma restrição moderada por muitos dias." },
   { key: "quarantineWeight", value: 0.5, label: "Perda de receita na quarentena", hint: "Peso da quarentena na fórmula da receita." },
-  { key: "researchBase", value: 0.25, label: "Pesquisa espontânea", hint: "Avanço diário da cura sem investimento dedicado, em pontos percentuais." },
+  { key: "researchBase", value: 0.05, label: "Pesquisa espontânea", hint: "Avanço diário da cura sem investimento dedicado, em pontos percentuais. Sem verba, a cura leva meses." },
   { key: "importRate", value: 0.028, label: "Importação entre bairros", hint: "Quanto a prevalência de um vizinho empurra casos novos." },
   { key: "startBudget", value: 26, label: "Verba inicial", hint: "Milhões fictícios disponíveis no primeiro dia." },
   { key: "startCapacity", value: 180, label: "Leitos iniciais", hint: "Abstração didática da rede. Não é o censo real de leitos de Maricá." },
