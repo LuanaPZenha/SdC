@@ -77,3 +77,9 @@ Gatilhos de evento: `calendar` dentro do mês e do dia, `random` com chance diá
 ## Verificação da curva
 
 `npm run sim` roda uma gestão que ignora a crise e outra que contém, pesquisa e responde aos boletins. A omissão precisa perder. A gestão atenta precisa chegar à cura.
+
+Autores: 
+Amanda Nick - Líder do Projeto
+Bruno Barral - FullStack
+Luana Zenha - Full Stack
+Renan Monteiro - Análise e Requisitos
