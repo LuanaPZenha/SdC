@@ -46,7 +46,7 @@ export function Inicio() {
   return (
     <main className="home" id="conteudo">
       <p className="kicker">Secretaria Municipal de Saúde · Maricá/RJ</p>
-      <h1 className="display">Sombras do Contágio</h1>
+      <h1 className="display game-title">Sombras do Contágio</h1>
       <p className="lede">
         Você assume a gestão da saúde pública enquanto a Apatia, uma condição fictícia transmitida pelo toque, se espalha
         pelos recortes da cidade. O trabalho é segurar a rede, a adesão e a pesquisa até a cura. Dengue, sarampo, pólio,

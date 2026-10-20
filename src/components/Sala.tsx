@@ -83,7 +83,7 @@ export function Sala() {
       <header className="topbar">
         <div className="brand">
           <span className="kicker">Sala de situação</span>
-          <a className="display" href="/">
+          <a className="display game-title" href="/">
             Sombras do Contágio
           </a>
           <span>{view.playerName}</span>
