@@ -1,6 +1,7 @@
 "use client";
 
-import type { DistrictView } from "@/lib/types";
+import { useEffect, useState } from "react";
+import type { CarrierTrip, DistrictView } from "@/lib/types";
 import { people } from "@/lib/format";
 import { LAGOON_PATH, MAP_VIEW, MUNICIPALITY_PATH, NEIGHBOR_LANDS, REGION_SHAPES } from "@/content/geography";
 
@@ -22,22 +23,93 @@ function heat(per10k: number): string {
   return `rgb(${mix.join(",")})`;
 }
 
+const NUDGE: Record<string, { x: number; y: number }> = {
+  centro: { x: 10, y: -30 },
+  aracatiba: { x: 28, y: 10 },
+  barra: { x: 6, y: 28 },
+  "sao-jose": { x: -14, y: 6 },
+};
+
+function stopOf(id: string): { x: number; y: number; name: string } | null {
+  const shape = REGION_SHAPES[id as keyof typeof REGION_SHAPES];
+  if (!shape) return null;
+  const shift = NUDGE[id] ?? { x: 0, y: 0 };
+  return { x: shape.labelX + shift.x, y: shape.labelY + shift.y - 16, name: shape.name };
+}
+
+function routePath(from: { x: number; y: number }, to: { x: number; y: number }): string {
+  const midX = (from.x + to.x) / 2;
+  const midY = (from.y + to.y) / 2;
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const length = Math.hypot(dx, dy) || 1;
+  const bend = Math.min(42, length * 0.18);
+  return `M ${from.x} ${from.y} Q ${midX + (-dy / length) * bend} ${midY + (dx / length) * bend} ${to.x} ${to.y}`;
+}
+
+function Bus({ trip, index, motion }: { trip: CarrierTrip; index: number; motion: boolean }) {
+  const from = stopOf(trip.from);
+  const to = stopOf(trip.to);
+  if (!from || !to) return null;
+  const pathId = `sdc-bus-${index}-${trip.from}-${trip.to}`;
+  const duration = 3.6;
+  const begin = index * 0.55;
+  return (
+    <g className="bus-run" pointerEvents="none">
+      <title>{`Ônibus de ${from.name} para ${to.name}, ${trip.carried} ${trip.carried === 1 ? "pessoa contaminada" : "pessoas contaminadas"}`}</title>
+      <path id={pathId} className="bus-route" d={routePath(from, to)} />
+      <g>
+        {motion ? (
+          <animateMotion dur={`${duration}s`} begin={`${begin}s`} rotate="auto" fill="freeze" repeatCount="1">
+            <mpath href={`#${pathId}`} />
+          </animateMotion>
+        ) : (
+          <animateMotion dur="0.01s" rotate="auto" fill="freeze" repeatCount="1">
+            <mpath href={`#${pathId}`} />
+          </animateMotion>
+        )}
+        <g className="bus" transform="scale(1.85)">
+          <rect className="bus-body" x={-11} y={-4.6} width={20} height={8.2} rx={1.5} />
+          <path className="bus-roof" d="M-8 -4.6 H5.2 L7.2 -8.2 H-6.4 Z" />
+          <rect className="bus-window" x={-6.2} y={-7.4} width={2.2} height={2.15} />
+          <rect className="bus-window" x={-3.1} y={-7.4} width={2.2} height={2.15} />
+          <rect className="bus-window" x={0} y={-7.4} width={2.2} height={2.15} />
+          <circle className="bus-wheel" cx={-5.2} cy={3.9} r={1.75} />
+          <circle className="bus-wheel" cx={5.4} cy={3.9} r={1.75} />
+        </g>
+      </g>
+      <circle className="arrival" cx={to.x} cy={to.y} r={4} opacity={0}>
+        {motion ? (
+          <>
+            <animate attributeName="r" from="3" to="18" dur="0.9s" begin={`${begin + duration}s`} fill="freeze" />
+            <animate attributeName="opacity" from="0.95" to="0" dur="0.9s" begin={`${begin + duration}s`} fill="freeze" />
+          </>
+        ) : null}
+      </circle>
+    </g>
+  );
+}
+
 export function Mapa({
   districts,
   selected,
   onSelect,
+  trips = [],
 }: {
   districts: DistrictView[];
   selected: string;
   onSelect: (id: string) => void;
+  trips?: CarrierTrip[];
 }) {
+  const [motion, setMotion] = useState(true);
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const apply = () => setMotion(!media.matches);
+    apply();
+    media.addEventListener("change", apply);
+    return () => media.removeEventListener("change", apply);
+  }, []);
   const byId = new Map(districts.map((district) => [district.id, district]));
-  const nudge: Record<string, { x: number; y: number }> = {
-    centro: { x: 10, y: -30 },
-    aracatiba: { x: 28, y: 10 },
-    barra: { x: 6, y: 28 },
-    "sao-jose": { x: -14, y: 6 },
-  };
   const outside: Record<string, { x: number; y: number } | null> = {
     Niterói: { x: 40, y: 270 },
     "São Gonçalo": { x: 126, y: 62 },
@@ -100,7 +172,7 @@ export function Mapa({
         const shape = REGION_SHAPES[id];
         const district = byId.get(id);
         if (!district) return null;
-        const shift = nudge[id] ?? { x: 0, y: 0 };
+        const shift = NUDGE[id] ?? { x: 0, y: 0 };
         const x = shape.labelX + shift.x;
         const y = shape.labelY + shift.y;
         const compact = id === "aracatiba" || id === "barra";
@@ -118,6 +190,9 @@ export function Mapa({
           </g>
         );
       })}
+      {trips.map((trip, index) => (
+        <Bus key={`${trip.from}-${trip.to}-${index}`} trip={trip} index={index} motion={motion} />
+      ))}
       <text className="ocean-label" x={MAP_VIEW.width / 2} y={MAP_VIEW.height - 16} textAnchor="middle">
         OCEANO ATLÂNTICO
       </text>

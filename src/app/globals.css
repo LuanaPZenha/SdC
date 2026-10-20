@@ -225,6 +225,32 @@ textarea { min-height: 110px; resize: vertical; }
 
 .ocean-label { fill: rgba(198, 220, 228, 0.42); font-size: 12px; letter-spacing: 0.34em; pointer-events: none; }
 
+.bus-route {
+  fill: none;
+  stroke: #e4372c;
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-dasharray: 2 8;
+  opacity: 0.92;
+  animation: bus-dash 0.7s linear infinite;
+}
+
+.bus-body { fill: #d61f18; stroke: #2a0908; stroke-width: 0.7; }
+
+.bus-roof { fill: #ff5c48; stroke: #2a0908; stroke-width: 0.45; }
+
+.bus-window { fill: #ffe7c2; }
+
+.bus-wheel { fill: #140e0c; }
+
+.arrival { fill: none; stroke: #ff5a48; stroke-width: 1.7; }
+
+@keyframes bus-dash { to { stroke-dashoffset: -40; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .bus-route { animation: none; }
+}
+
 .detail { display: grid; grid-template-columns: 1.4fr repeat(4, 1fr); gap: 8px; margin-top: 10px; }
 
 .stat { background: rgba(28, 36, 24, 0.05); padding: 8px; }
