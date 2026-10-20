@@ -1,0 +1,27 @@
+{
+  "name": "sombras-do-contagio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Simulador educativo de gestão de uma epidemia de contato em Maricá.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "sim": "tsx scripts/simulate.ts",
+    "export:sql": "tsx scripts/export-sql.ts"
+  },
+  "dependencies": {
+    "next": "^15.5.4",
+    "pg": "^8.16.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "@types/pg": "^8.15.4",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.9.2"
+  }
+}
