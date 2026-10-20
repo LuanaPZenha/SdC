@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { EFFECT_KEYS, type Catalog, type GameEvent, type Parameter } from "@/lib/types";
 import { validateCatalog } from "@/lib/validate";
 
@@ -111,9 +112,9 @@ export function Admin() {
         Políticas, eventos, parâmetros e as fórmulas de casos novos, óbitos, receita, pesquisa e pontuação ficam fora do código.
       </p>
       <p>
-        <a className="text-link" href="/">
+        <Link className="text-link" href="/">
           Voltar ao briefing
-        </a>
+        </Link>
       </p>
       {!catalog ? (
         <form

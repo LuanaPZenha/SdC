@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Biohazard } from "@/components/Biohazard";
 import { GestaoIcon, NewsIcon, SalaIcon } from "@/components/TabIcons";
@@ -156,9 +157,9 @@ export function Sala() {
     return (
       <main className="home" id="conteudo">
         <h1 className="display">Nenhuma partida aberta</h1>
-        <a className="button" href="/">
+        <Link className="button" href="/">
           Voltar ao briefing
-        </a>
+        </Link>
       </main>
     );
   }
@@ -173,10 +174,10 @@ export function Sala() {
       <header className="topbar">
         <div className="brand">
           <span className="kicker">Sala de situação</span>
-          <a className="display game-title" href="/">
+          <Link className="display game-title" href="/">
             <Biohazard />
             <span>Sombras do Contágio</span>
-          </a>
+          </Link>
           <span>{view.playerName}</span>
         </div>
         <div className="gauges">
@@ -397,12 +398,12 @@ export function Sala() {
               {view.day} dias de gestão · pesquisa {view.research.toFixed(1).replace(".", ",")}% · {people(view.dead)} óbitos · {view.score} pontos.
             </p>
             <div className="actions">
-              <a className="button" href="/ranking">
+              <Link className="button" href="/ranking">
                 Ver o placar
-              </a>
-              <a className="button secondary" href="/">
+              </Link>
+              <Link className="button secondary" href="/">
                 Nova gestão
-              </a>
+              </Link>
             </div>
           </section>
         </div>

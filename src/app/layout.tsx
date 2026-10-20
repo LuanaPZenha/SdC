@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Outfit } from "next/font/google";
+import { Trilha } from "@/components/Trilha";
 import "./globals.css";
 
 const titleFont = Cormorant_Garamond({
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Ir para o conteúdo
         </a>
         {children}
+        <Trilha />
       </body>
     </html>
   );

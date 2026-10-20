@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { people } from "@/lib/format";
 import type { RankingEntry } from "@/lib/types";
 
@@ -24,9 +25,9 @@ export function Placar() {
       <h1 className="display">Placar</h1>
       <p className="lede">A ordem principal é quantos dias a gestão durou. Vitória, pontuação e óbitos desempata. O registro entra no fim da partida.</p>
       <p>
-        <a className="text-link" href="/">
+        <Link className="text-link" href="/">
           Voltar ao briefing
-        </a>
+        </Link>
       </p>
       {error ? <p className="error">{error}</p> : null}
       <div className="table-wrap">

@@ -72,6 +72,25 @@ button { cursor: pointer; }
 
 a { color: inherit; }
 
+body > .trilha-mount { position: static; z-index: auto; }
+
+.trilha {
+  position: fixed;
+  right: 16px;
+  bottom: 14px;
+  z-index: 35;
+  background: rgba(7, 8, 12, 0.72);
+  color: var(--brass-dim);
+  border: 1px solid rgba(212, 181, 106, 0.35);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 6px 10px;
+}
+
+.trilha.on { color: var(--brass); border-color: rgba(212, 181, 106, 0.7); }
+
 .skip {
   position: absolute;
   left: 12px;

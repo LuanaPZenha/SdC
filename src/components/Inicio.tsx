@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Biohazard } from "@/components/Biohazard";
 import { STARTS } from "@/lib/starts";
@@ -105,9 +106,9 @@ export function Inicio() {
             <button className="button" disabled={busy} type="submit">
               {busy ? "Abrindo…" : "Assumir a gestão"}
             </button>
-            <a className="button secondary" href="/ranking">
+            <Link className="button secondary" href="/ranking">
               Placar
-            </a>
+            </Link>
           </div>
         </form>
         <aside className="panel">
