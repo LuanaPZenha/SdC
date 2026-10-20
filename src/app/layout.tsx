@@ -1,11 +1,18 @@
 import type { Metadata } from "next";
-import { Cinzel } from "next/font/google";
+import { Cormorant_Garamond, Outfit } from "next/font/google";
 import "./globals.css";
 
-const titleFont = Cinzel({
+const titleFont = Cormorant_Garamond({
   subsets: ["latin", "latin-ext"],
-  weight: ["700", "900"],
+  weight: ["500", "600", "700"],
   variable: "--font-title",
+  display: "swap",
+});
+
+const bodyFont = Outfit({
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-body",
   display: "swap",
 });
 
@@ -16,7 +23,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={titleFont.variable}>
+    <html lang="pt-BR" className={`${titleFont.variable} ${bodyFont.variable}`}>
       <body>
         <a className="skip" href="#conteudo">
           Ir para o conteúdo

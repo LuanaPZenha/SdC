@@ -456,7 +456,7 @@ function Spark({ history }: { history: number[] }) {
     .join(" ");
   return (
     <svg className="spark" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Curva de infectados">
-      <path d={path} fill="none" stroke="#e7c27a" strokeWidth="2" />
+      <path d={path} fill="none" stroke="#d7b56a" strokeWidth="2" />
     </svg>
   );
 }

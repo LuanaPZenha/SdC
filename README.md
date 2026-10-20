@@ -201,7 +201,7 @@ Estas são as atualizações que estão no jogo publicado, em cima do simulador 
 - **Boletins na época certa.** Carnaval, aniversário, Amparo, temporada, dengue e SRAG só disparam na janela do calendário. Sarampo, pólio, meningite, desinformação, variante e RJ-106 esperam o dia mínimo e, quando é o caso, um sorteio.
 - **Ônibus do contaminado.** Viagem aleatória, sem cota diária e sem data, de um recorte com caso para um vizinho. O micro-ônibus vermelho desenha o caminho e o caso entra no destino.
 - **Ambulância de insumos.** Saída aleatória do hospital do Centro para uma UPA ou um posto real, com leitos extras por três dias.
-- **Título.** O nome do jogo usa a capitular Cinzel. A marca e a fonte de outro jogo não entram no repositório.
+- **Título e sala.** O nome usa a serifada Cormorant Garamond; a interface, a Outfit. O fundo é uma sala escura, com filete de latão, e o papel claro fica nos dossiês. A marca e a fonte de outro jogo não entram no repositório.
 - **Símbolo de infecção.** O trevo vermelho fica ao lado do nome na capa e na sala. O nome da sala continua em uma linha.
 - **Aba Gestão.** As quatro famílias de medidas saíram da vista do mapa. Encerrar o dia continua à mão.
 - **Aba News.** Boletim, registro e novidades ficam juntos. Uma notícia nova abre um popup no estilo da sala.
