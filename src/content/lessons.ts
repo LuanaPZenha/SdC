@@ -29,7 +29,7 @@ export const LESSONS: Lesson[] = [
     id: "capacidade",
     title: "A letalidade também é da rede",
     topic: "Hospitais",
-    body: "Quando há leito e equipe, parte dos graves sobrevive. Quando a ocupação passa de 100%, o excedente é tratado tarde ou não é tratado. A mesma doença mata mais. Arbovirose no verão e SRAG no inverno não precisam ser a Apatia para produzir esse excesso: basta ocuparem o leito que faltou. Os 180 leitos iniciais são uma abstração didática, não o inventário real das unidades de Maricá.",
+    body: "Quando há leito e equipe, parte dos graves sobrevive. Quando a ocupação passa de 100%, o excedente é tratado tarde ou não é tratado. A mesma doença mata mais. Arbovirose no verão e SRAG no inverno não precisam ser a Apatia para produzir esse excesso: basta ocuparem o leito que faltou. Os 180 leitos iniciais são uma abstração didática, não o inventário real das unidades de Maricá. De vez em quando uma ambulância leva insumos do Hospital Municipal Conde Modesto Leal, no Centro, para a UPA de Inoã, a UPAM Santa Rita ou um posto real. Isso abre algumas vagas por três dias. Não cria leito permanente.",
   },
   {
     id: "vias",
