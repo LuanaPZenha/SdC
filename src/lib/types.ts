@@ -227,6 +227,7 @@ export type GameState = {
   startId: string;
   day: number;
   date: string;
+  dayEndsAt: string;
   budget: number;
   capacity: number;
   research: number;
@@ -282,6 +283,7 @@ export type GameView = {
   day: number;
   date: string;
   dateLabel: string;
+  dayEndsAt: string;
   status: GameState["status"];
   endingTitle: string | null;
   endingText: string | null;
@@ -336,4 +338,5 @@ export type Action =
   | { type: "toggle"; policyId: string }
   | { type: "instant"; policyId: string }
   | { type: "choose"; choiceId: string }
-  | { type: "endDay" };
+  | { type: "endDay" }
+  | { type: "tick" };

@@ -1,11 +1,26 @@
 import { NextResponse } from "next/server";
-import { applyAction, buildView, createInitialState } from "@/lib/engine";
+import { applyAction, buildView, createInitialState, ensureClock } from "@/lib/engine";
 import { findStart } from "@/lib/starts";
 import { getRepo, newId } from "@/lib/store";
 import type { GameState, RankingEntry } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+const lanes = new Map<string, Promise<unknown>>();
+
+function lane<T>(id: string, work: () => Promise<T>): Promise<T> {
+  const previous = lanes.get(id) ?? Promise.resolve();
+  const run = previous.then(work, work);
+  lanes.set(
+    id,
+    run.then(
+      () => undefined,
+      () => undefined,
+    ),
+  );
+  return run;
+}
 
 type Body = {
   action?: string;
@@ -62,24 +77,33 @@ export async function POST(request: Request) {
       return NextResponse.json({ view });
     }
     if (!body.id) return NextResponse.json({ error: "Partida não informada." }, { status: 400 });
-    const current = await repo.game(body.id);
-    if (!current) return NextResponse.json({ error: "Partida não encontrada." }, { status: 404 });
-    if (body.action === "load") return NextResponse.json({ view: buildView(current, catalog) });
-    const action =
-      body.action === "toggle"
-        ? { type: "toggle" as const, policyId: body.policyId ?? "" }
-        : body.action === "instant"
-          ? { type: "instant" as const, policyId: body.policyId ?? "" }
-          : body.action === "choose"
-            ? { type: "choose" as const, choiceId: body.choiceId ?? "" }
-            : body.action === "end"
-              ? { type: "endDay" as const }
-              : null;
-    if (!action) return NextResponse.json({ error: "Ação desconhecida." }, { status: 400 });
-    const result = applyAction(current, catalog, action);
-    if (result.error) return NextResponse.json({ error: result.error, view: buildView(current, catalog) }, { status: 400 });
-    const view = await publish(current, result.state);
-    return NextResponse.json({ view });
+    return await lane(body.id, async () => {
+      const current = await repo.game(body.id ?? "");
+      if (!current) return NextResponse.json({ error: "Partida não encontrada." }, { status: 404 });
+      if (body.action === "load") {
+        const next = structuredClone(current);
+        if (ensureClock(next)) await repo.saveGame(next);
+        return NextResponse.json({ view: buildView(next, catalog) });
+      }
+      const action =
+        body.action === "toggle"
+          ? { type: "toggle" as const, policyId: body.policyId ?? "" }
+          : body.action === "instant"
+            ? { type: "instant" as const, policyId: body.policyId ?? "" }
+            : body.action === "choose"
+              ? { type: "choose" as const, choiceId: body.choiceId ?? "" }
+              : body.action === "end"
+                ? { type: "endDay" as const }
+                : body.action === "tick"
+                  ? { type: "tick" as const }
+                  : null;
+      if (!action) return NextResponse.json({ error: "Ação desconhecida." }, { status: 400 });
+      const result = applyAction(current, catalog, action);
+      if (result.error) return NextResponse.json({ error: result.error, view: buildView(current, catalog) }, { status: 400 });
+      if (result.changed === false) return NextResponse.json({ view: buildView(result.state, catalog) });
+      const view = await publish(current, result.state);
+      return NextResponse.json({ view });
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Falha ao processar a jogada.";
     return NextResponse.json({ error: message }, { status: 500 });

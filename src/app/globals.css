@@ -302,6 +302,27 @@ input[type="radio"], input[type="checkbox"] { accent-color: var(--copper); }
 
 .date-block .when { text-transform: none; letter-spacing: 0; font-weight: 500; color: var(--muted); }
 
+.day-clock {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(212, 181, 106, 0.18);
+}
+
+.day-clock strong {
+  font-variant-numeric: tabular-nums;
+  font-size: 1.35rem;
+  color: var(--brass);
+}
+
+.day-clock.urgent strong { color: var(--danger); }
+
+.dossier .day-note {
+  margin: 0 0 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--copper-deep);
+}
+
 .bar { height: 5px; background: rgba(255, 255, 255, 0.08); margin-top: 8px; }
 
 .bar i { display: block; height: 100%; background: var(--brass); }

@@ -1,4 +1,5 @@
 import { CARE_SITES, HOSPITAL } from "@/content/health";
+import { DAY_MS } from "@/lib/clock";
 import { addDays, clamp, formatDate, round1 } from "@/lib/format";
 import { evalFormula } from "@/lib/formula";
 import { findStart } from "@/lib/starts";
@@ -105,6 +106,13 @@ function heal(state: GameState, catalog: Catalog) {
   }
   const policyIds = new Set(catalog.policies.map((policy) => policy.id));
   state.activePolicies = state.activePolicies.filter((id) => policyIds.has(id));
+  ensureClock(state);
+}
+
+export function ensureClock(state: GameState, now = Date.now()): boolean {
+  if (state.dayEndsAt && Number.isFinite(Date.parse(state.dayEndsAt))) return false;
+  state.dayEndsAt = new Date(now + DAY_MS).toISOString();
+  return true;
 }
 
 function combine(bags: EffectBag[]): EffectBag {
@@ -397,6 +405,7 @@ export function createInitialState(playerName: string, catalog: Catalog, id: str
     startId: start.id,
     day: 1,
     date: start.date,
+    dayEndsAt: new Date(Date.now() + DAY_MS).toISOString(),
     budget: param(catalog, "startBudget"),
     capacity: param(catalog, "startCapacity"),
     research: 0,
@@ -436,24 +445,53 @@ function findPolicy(catalog: Catalog, id: string): Policy | undefined {
   return catalog.policies.find((policy) => policy.id === id);
 }
 
-export function applyAction(state: GameState, catalog: Catalog, action: Action): { state: GameState; error?: string } {
+export function applyAction(state: GameState, catalog: Catalog, action: Action): { state: GameState; error?: string; changed?: boolean } {
+  if (action.type === "tick" && state.status !== "playing") return { state, changed: false };
   const error = validateAction(state, catalog, action);
   if (error) return { state, error };
   const next = structuredClone(state);
   heal(next, catalog);
+  if (action.type === "tick") {
+    const now = Date.now();
+    if (Date.parse(next.dayEndsAt) > now) {
+      const stamped = next.dayEndsAt !== state.dayEndsAt;
+      return { state: stamped ? next : state, changed: stamped };
+    }
+    let guard = 0;
+    while (next.status === "playing" && Date.parse(next.dayEndsAt) <= now && guard < 180) {
+      if (next.pendingEventId) lapseEvent(next, catalog);
+      resolveDay(next, catalog, "continue");
+      guard += 1;
+    }
+  }
   if (action.type === "toggle") togglePolicy(next, catalog, action.policyId);
   if (action.type === "instant") useInstant(next, catalog, action.policyId);
   if (action.type === "choose") chooseEvent(next, catalog, action.choiceId);
-  if (action.type === "endDay") resolveDay(next, catalog);
+  if (action.type === "endDay") resolveDay(next, catalog, "fresh");
   if (next.status !== "playing") {
     const view = project(next, catalog);
     conclude(next, catalog, view.occupancy);
   }
-  return { state: next };
+  return { state: next, changed: true };
+}
+
+function lapseEvent(state: GameState, catalog: Catalog) {
+  const event = catalog.events.find((item) => item.id === state.pendingEventId);
+  state.pendingEventId = null;
+  if (!event) return;
+  state.fired[event.id] = state.day;
+  state.lastOutcome = {
+    title: event.title,
+    text: "O dia fechou sem uma resposta. Nenhuma medida deste boletim entrou em vigor.",
+    lesson: event.lesson,
+  };
+  remember(state, { id: `evento-${event.id}`, title: event.title, topic: event.category, body: event.lesson });
+  pushLog(state, `${event.title}: o dia passou sem decisão.`);
 }
 
 function validateAction(state: GameState, catalog: Catalog, action: Action): string | undefined {
   if (state.status !== "playing") return "Esta gestão já foi encerrada.";
+  if (action.type === "tick") return undefined;
   if (action.type === "endDay" && state.pendingEventId) return "Resolva o boletim do dia antes de avançar.";
   if (action.type === "choose") {
     const event = catalog.events.find((item) => item.id === state.pendingEventId);
@@ -600,7 +638,7 @@ function supplyDispatch(state: GameState): SupplyRun[] {
   ];
 }
 
-function resolveDay(state: GameState, catalog: Catalog) {
+function resolveDay(state: GameState, catalog: Catalog, clock: "fresh" | "continue") {
   suspendUnaffordable(state, catalog);
   const before = project(state, catalog);
   state.budget = round1(Math.max(0, state.budget + before.income - before.upkeep));
@@ -741,9 +779,12 @@ function resolveDay(state: GameState, catalog: Catalog) {
   );
   conclude(state, catalog, endView.occupancy);
   if (state.status !== "playing") return;
+  const previousEnd = Date.parse(state.dayEndsAt);
   state.day += 1;
   state.date = addDays(state.date, 1);
   state.pendingEventId = pickEvent(state, catalog);
+  const nextEnd = clock === "fresh" || !Number.isFinite(previousEnd) ? Date.now() + DAY_MS : previousEnd + DAY_MS;
+  state.dayEndsAt = new Date(nextEnd).toISOString();
 }
 
 function stochastic(value: number, roll: number): number {
@@ -786,6 +827,7 @@ export function buildView(state: GameState, catalog: Catalog): GameView {
     day: state.day,
     date: state.date,
     dateLabel: formatDate(state.date),
+    dayEndsAt: state.dayEndsAt,
     status: state.status,
     endingTitle: state.endingTitle,
     endingText: state.endingText,

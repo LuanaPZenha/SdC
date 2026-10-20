@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Biohazard } from "@/components/Biohazard";
 import { GestaoIcon, NewsIcon, SalaIcon } from "@/components/TabIcons";
 import { Mapa } from "@/components/Mapa";
+import { dayClock } from "@/lib/clock";
 import { addDays, dateParts, formatDayMonth, money, people } from "@/lib/format";
 import type { GameView, PolicyView } from "@/lib/types";
 
@@ -78,7 +79,10 @@ export function Sala() {
   const [codex, setCodex] = useState(false);
   const [popup, setPopup] = useState<Flash[] | null>(null);
   const [unread, setUnread] = useState(false);
+  const [now, setNow] = useState(() => Date.now());
   const pendingNews = useRef<Flash[]>([]);
+  const ticking = useRef(false);
+  const actRef = useRef<(body: object) => Promise<void>>(async () => undefined);
 
   useEffect(() => {
     if (!id) return;
@@ -128,6 +132,24 @@ export function Sala() {
     }
   }
 
+  actRef.current = act;
+
+  useEffect(() => {
+    if (view?.status !== "playing") return;
+    const timer = window.setInterval(() => setNow(Date.now()), 200);
+    return () => window.clearInterval(timer);
+  }, [view?.status]);
+
+  useEffect(() => {
+    if (!view || view.status !== "playing" || !view.dayEndsAt) return;
+    if (Date.parse(view.dayEndsAt) > now) return;
+    if (ticking.current) return;
+    ticking.current = true;
+    void actRef.current({ action: "tick" }).finally(() => {
+      ticking.current = false;
+    });
+  }, [now, view]);
+
   const district = useMemo(() => view?.districts.find((item) => item.id === selected) ?? view?.districts[0], [view, selected]);
 
   if (!id || missing) {
@@ -144,6 +166,7 @@ export function Sala() {
 
   const policies = view.policies.filter((policy) => policy.category === tab);
   const activeUpgrades = view.policies.filter((policy) => policy.active).length;
+  const clock = view.status === "playing" && view.dayEndsAt ? dayClock(view.dayEndsAt, now) : null;
 
   return (
     <div className="room" id="conteudo">
@@ -161,6 +184,16 @@ export function Sala() {
             <span>{dateParts(view.date).weekday}</span>
             <strong className="display">{formatDayMonth(view.date)}</strong>
             <span className="when">{dateParts(view.date).year} · dia {view.day} da gestão</span>
+            {clock ? (
+              <div className={clock.urgent ? "day-clock urgent" : "day-clock"} role="timer" aria-label={`Restam ${clock.secondsLeft} segundos neste dia. Na cidade são ${clock.label}.`}>
+                <span>Relógio do dia</span>
+                <strong>{clock.secondsLeft}s</strong>
+                <span className="when">{clock.label} na cidade · 60s valem 24h</span>
+                <div className={clock.urgent ? "bar bad" : "bar"} aria-hidden="true">
+                  <i style={{ width: `${clock.progress}%` }} />
+                </div>
+              </div>
+            ) : null}
           </div>
           <Meter label="Fundo emergencial" value={`R$ ${money(view.budget)} mi`} width={Math.min(100, (view.budget / 30) * 100)} hint={`Receita prevista ${money(view.income)} · manutenção ${money(view.upkeep)}`} />
           <Meter label="Ocupação hospitalar" value={`${Math.round(view.occupancy * 100)}%`} width={Math.min(100, view.occupancy * 100)} bad={view.occupancy > 0.85} hint={`${Math.round(view.apatiaBeds)} leitos da Apatia · ${Math.round(view.parallelBeds)} de outras síndromes · ${Math.round(view.capacity)} vagas`} />
@@ -189,7 +222,7 @@ export function Sala() {
             <span>News{unread ? " · novo" : ""}</span>
           </button>
         </div>
-        <button className="end-day" type="button" disabled={busy || view.status !== "playing" || Boolean(view.pending)} onClick={() => void act({ action: "end" })}>
+        <button className="end-day" type="button" title="Encerra o dia agora. Se ninguém apertar, o relógio fecha o dia em 60 segundos." disabled={busy || view.status !== "playing" || Boolean(view.pending)} onClick={() => void act({ action: "end" })}>
           {busy ? "Registrando…" : `Encerrar ${formatDayMonth(view.date)}`}
         </button>
       </nav>
@@ -298,7 +331,7 @@ export function Sala() {
               ))}
             </>
           ) : (
-            <p>O primeiro dia ainda não fechou. Resolva o boletim e escolha as medidas antes de encerrar.</p>
+            <p>O primeiro dia ainda não fechou. O relógio corre: 60 segundos fecham o dia, com ou sem decisão.</p>
           )}
           {view.tips.map((tip) => (
             <p key={tip}>{tip}</p>
@@ -334,6 +367,11 @@ export function Sala() {
         <div className="overlay">
           <section className="dossier" role="dialog" aria-modal="true" aria-labelledby="boletim-titulo">
             <p className="kicker">{view.pending.category}</p>
+            {clock ? (
+              <p className="day-note">
+                {formatDayMonth(view.date)} fecha em {clock.secondsLeft}s. Sem resposta, o tempo passa assim mesmo.
+              </p>
+            ) : null}
             <h2 className="display" id="boletim-titulo">
               {view.pending.title}
             </h2>
