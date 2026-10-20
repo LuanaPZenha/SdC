@@ -60,7 +60,7 @@ export const TIPS: Tip[] = [
   {
     id: "dica-pesquisa",
     text: "A cura não anda sozinha. A pesquisa básica é lenta; a intensiva cabe mal junto com uma quarentena rígida.",
-    trigger: { type: "all", all: [{ type: "metric", metric: "research", op: "lt", value: 35 }, { type: "metric", metric: "day", op: "gt", value: 6 }] },
+    trigger: { type: "all", all: [{ type: "metric", metric: "research", op: "lt", value: 35 }, { type: "metric", metric: "day", op: "gt", value: 21 }] },
   },
   {
     id: "dica-vacina",
