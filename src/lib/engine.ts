@@ -1,3 +1,4 @@
+import { CARE_SITES, HOSPITAL } from "@/content/health";
 import { addDays, clamp, formatDate, round1 } from "@/lib/format";
 import { evalFormula } from "@/lib/formula";
 import { findStart } from "@/lib/starts";
@@ -7,6 +8,7 @@ import type {
   CodexEntry,
   DayReport,
   EffectBag,
+  SupplyRun,
   GameState,
   GameView,
   Policy,
@@ -575,6 +577,29 @@ function carrierTrips(state: GameState, catalog: Catalog, mods: EffectBag) {
   return trips;
 }
 
+function supplyDispatch(state: GameState): SupplyRun[] {
+  if (nextRandom(state) > 0.11) return [];
+  const site = CARE_SITES[Math.floor(nextRandom(state) * CARE_SITES.length)];
+  if (!site || site.districtId === HOSPITAL.districtId) return [];
+  const beds = 6;
+  state.timedModifiers.push({
+    id: `insumos-${state.day}-${site.districtId}-${site.kind}`,
+    name: `Insumos · ${site.name}`,
+    daysLeft: 4,
+    effects: { capacity: beds },
+  });
+  return [
+    {
+      from: HOSPITAL.districtId,
+      to: site.districtId,
+      originName: HOSPITAL.name,
+      destinationName: site.name,
+      phrase: site.phrase,
+      beds,
+    },
+  ];
+}
+
 function resolveDay(state: GameState, catalog: Catalog) {
   suspendUnaffordable(state, catalog);
   const before = project(state, catalog);
@@ -653,6 +678,12 @@ function resolveDay(state: GameState, catalog: Catalog) {
     newInfections += trip.carried;
   }
 
+  const supplyRuns = supplyDispatch(state);
+  for (const run of supplyRuns) {
+    notes.push(`Uma ambulância saiu do ${run.originName}, no Centro, levando insumos para ${run.phrase}. A unidade ganha ${run.beds} vagas por três dias.`);
+    pushLog(state, `Ambulância do hospital para ${run.destinationName}.`);
+  }
+
   for (const faction of catalog.factions) {
     let delta = mods.factionsDaily?.[faction.id] ?? 0;
     if (faction.id === "saude") {
@@ -692,6 +723,7 @@ function resolveDay(state: GameState, catalog: Catalog) {
     occupancy: endView.occupancy,
     notes,
     trips,
+    supplyRuns,
   };
   state.lastReport = report;
   state.history.push({
@@ -800,7 +832,9 @@ export function buildView(state: GameState, catalog: Catalog): GameView {
         }
       : null,
     lastOutcome: state.lastOutcome,
-    report: state.lastReport ? { ...state.lastReport, trips: state.lastReport.trips ?? [] } : null,
+    report: state.lastReport
+      ? { ...state.lastReport, trips: state.lastReport.trips ?? [], supplyRuns: state.lastReport.supplyRuns ?? [] }
+      : null,
     log: state.log,
     modifiers: state.timedModifiers.map((modifier) => ({ name: modifier.name, daysLeft: modifier.daysLeft })),
     history: state.history,

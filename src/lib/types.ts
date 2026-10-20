@@ -184,6 +184,15 @@ export type CarrierTrip = {
   carried: number;
 };
 
+export type SupplyRun = {
+  from: string;
+  to: string;
+  originName: string;
+  destinationName: string;
+  phrase: string;
+  beds: number;
+};
+
 export type DayReport = {
   day: number;
   date: string;
@@ -196,6 +205,7 @@ export type DayReport = {
   occupancy: number;
   notes: string[];
   trips: CarrierTrip[];
+  supplyRuns: SupplyRun[];
 };
 
 export type CodexEntry = {
