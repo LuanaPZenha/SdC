@@ -123,8 +123,8 @@ export function Inicio() {
           <h2 className="display">De onde vem o conteúdo</h2>
           <p>
             Eventos, políticas, parâmetros e as fórmulas de contágio e de óbito ficam no banco. Um professor altera um
-            número ou inclui uma variante nova sem mexer no código. A placa do mapa é esquemática: Maricá tem quatro
-            distritos oficiais e a soma das populações segue a estimativa do IBGE para 2026, 212.703 pessoas.
+            número ou inclui uma variante nova sem mexer no código. O mapa usa o contorno oficial de Maricá e divide o
+            município em oito recortes. A soma das populações segue a estimativa do IBGE para 2026, 212.703 pessoas.
           </p>
           <p className="storage">
             {health

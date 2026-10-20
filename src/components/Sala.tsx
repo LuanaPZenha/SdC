@@ -128,7 +128,7 @@ export function Sala() {
             </div>
           </div>
           <p className="muted">
-            Placa esquemática, não é o limite oficial. Turismo {Math.round(district.tourism * 100)}% · escolas {Math.round(district.schools * 100)}% · entrada {Math.round(district.border * 100)}% · idosos {Math.round(district.elderly * 100)}%. A cor acompanha casos por 10 mil habitantes.
+            O contorno é a malha do IBGE. Os oito recortes agrupam bairros reais e a cor acompanha casos por 10 mil habitantes. Turismo {Math.round(district.tourism * 100)}% · escolas {Math.round(district.schools * 100)}% · entrada {Math.round(district.border * 100)}% · idosos {Math.round(district.elderly * 100)}%.
           </p>
         </section>
         <aside className="side">

@@ -66,8 +66,9 @@ Gatilhos de evento: `calendar` dentro do mês e do dia, `random` com chance diá
 
 ## Honestidade dos dados
 
-- A população somada dos recortes é 212.703, a estimativa do IBGE para Maricá em 2026. O Censo 2022 contou 197.277. Os oito recortes não são a população oficial de cada bairro.
-- Os distritos oficiais são Sede, Ponta Negra, Inoã e Itaipuaçu.
+- O contorno do mapa é a malha municipal do IBGE (código 3302700). As lagoas e os bairros vêm do OpenStreetMap. Os vizinhos desenhados ao redor são Niterói, São Gonçalo, Itaboraí, Tanguá, Rio Bonito e Saquarema.
+- A população somada dos recortes é 212.703, a estimativa do IBGE para Maricá em 2026. O Censo 2022 contou 197.277. Os oito recortes agrupam bairros reais, mas a população de cada um não é a cifra oficial daquele bairro.
+- Os distritos oficiais são Sede, Ponta Negra, Inoã e Itaipuaçu. Itaipuaçu fica a oeste, junto à Serra da Tiririca; Ponta Negra fica a leste, na divisa com Saquarema.
 - A data cívica do município é 26 de maio. A festa da padroeira e o Carnaval entram na janela em que a cidade de fato os realiza.
 - A capacidade inicial de 180 leitos é didática, não um censo de leitos.
 - O alerta de poliovírus é risco de reintrodução por cobertura baixa. O Brasil é área livre; o jogo não declara um surto.
