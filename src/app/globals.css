@@ -74,22 +74,43 @@ a { color: inherit; }
 
 body > .trilha-mount { position: static; z-index: auto; }
 
-.trilha {
+.trilha-dock {
   position: fixed;
   right: 16px;
   bottom: 14px;
   z-index: 35;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   background: rgba(7, 8, 12, 0.72);
   color: var(--brass-dim);
   border: 1px solid rgba(212, 181, 106, 0.35);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  font-size: 0.68rem;
-  font-weight: 600;
   padding: 6px 10px;
 }
 
-.trilha.on { color: var(--brass); border-color: rgba(212, 181, 106, 0.7); }
+.trilha-dock.on { color: var(--brass); border-color: rgba(212, 181, 106, 0.7); }
+
+.trilha {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  border: 0;
+}
+
+.trilha svg { width: 22px; height: 22px; display: block; }
+
+.trilha-volume {
+  width: 88px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--brass);
+  cursor: pointer;
+  background: transparent;
+}
 
 .skip {
   position: absolute;
@@ -666,6 +687,50 @@ th {
 
 .loading { padding: 48px 20px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.8rem; }
 
+.manchas {
+  position: fixed;
+  inset: 0;
+  z-index: 32;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 1;
+  transition: opacity 1.7s ease;
+  mask-image: radial-gradient(ellipse at center, transparent 50%, #000 76%);
+}
+
+.manchas.out { opacity: 0; }
+
+.manchas-wash {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(130% 46% at 50% -10%, rgba(132, 18, 16, 0.34), transparent 60%),
+    radial-gradient(130% 42% at 50% 110%, rgba(96, 12, 14, 0.3), transparent 58%),
+    radial-gradient(46% 130% at -10% 50%, rgba(112, 14, 16, 0.28), transparent 60%),
+    radial-gradient(46% 130% at 110% 50%, rgba(112, 14, 16, 0.28), transparent 60%);
+  transition: opacity 240ms linear;
+}
+
+.mancha {
+  position: absolute;
+  pointer-events: none;
+  transition: opacity 240ms linear, transform 240ms linear;
+}
+
+.mancha-spin {
+  display: block;
+  width: 100%;
+  height: 100%;
+  filter: blur(0.4px);
+}
+
+.mancha svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
 @media (max-width: 980px) {
   .grid-3, .grid-2, .war, .topbar, .dock-grid, .detail, .admin-layout, .gauges { grid-template-columns: 1fr; }
   .views .end-day { width: 100%; margin-left: 0; }
@@ -676,4 +741,6 @@ th {
 
 @media (prefers-reduced-motion: reduce) {
   .stamp { transform: none; }
+  .manchas { transition-duration: 0.45s; }
+  .mancha, .manchas-wash { transition: none; }
 }

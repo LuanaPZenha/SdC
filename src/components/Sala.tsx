@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Biohazard } from "@/components/Biohazard";
+import { Manchas } from "@/components/Manchas";
 import { GestaoIcon, NewsIcon, SalaIcon } from "@/components/TabIcons";
 import { Mapa } from "@/components/Mapa";
 import { dayClock } from "@/lib/clock";
@@ -168,9 +169,11 @@ export function Sala() {
   const policies = view.policies.filter((policy) => policy.category === tab);
   const activeUpgrades = view.policies.filter((policy) => policy.active).length;
   const clock = view.status === "playing" && view.dayEndsAt ? dayClock(view.dayEndsAt, now) : null;
+  const remainingMs = clock && view.dayEndsAt ? Math.max(0, Date.parse(view.dayEndsAt) - now) : null;
 
   return (
     <div className="room" id="conteudo">
+      <Manchas remainingMs={remainingMs} />
       <header className="topbar">
         <div className="brand">
           <span className="kicker">Sala de situação</span>
