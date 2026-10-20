@@ -169,31 +169,24 @@ export function Sala() {
       </header>
       <nav className="views" aria-label="Painéis da sala">
         <div className="tabs" role="tablist">
-          <button className={panel === "sala" ? "tab icon-tab on" : "tab icon-tab"} type="button" aria-label="Sala" title="Sala" onClick={() => setPanel("sala")}>
+          <button className={panel === "sala" ? "tab icon-tab on" : "tab icon-tab"} type="button" onClick={() => setPanel("sala")}>
             <SalaIcon />
+            <span>Sala</span>
           </button>
-          <button
-            className={panel === "gestao" ? "tab icon-tab on" : "tab icon-tab"}
-            type="button"
-            aria-label={activeUpgrades > 0 ? `Gestão, ${activeUpgrades} ativas` : "Gestão"}
-            title="Gestão"
-            onClick={() => setPanel("gestao")}
-          >
+          <button className={panel === "gestao" ? "tab icon-tab on" : "tab icon-tab"} type="button" onClick={() => setPanel("gestao")}>
             <GestaoIcon />
-            {activeUpgrades > 0 ? <span className="tab-badge">{activeUpgrades}</span> : null}
+            <span>Gestão{activeUpgrades > 0 ? ` · ${activeUpgrades}` : ""}</span>
           </button>
           <button
             className={panel === "news" ? "tab icon-tab on" : "tab icon-tab"}
             type="button"
-            aria-label={unread ? "News, novidade" : "News"}
-            title="News"
             onClick={() => {
               setPanel("news");
               setUnread(false);
             }}
           >
             <NewsIcon />
-            {unread ? <span className="tab-badge">novo</span> : null}
+            <span>News{unread ? " · novo" : ""}</span>
           </button>
         </div>
         <button className="end-day" type="button" disabled={busy || view.status !== "playing" || Boolean(view.pending)} onClick={() => void act({ action: "end" })}>
