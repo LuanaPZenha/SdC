@@ -39,7 +39,7 @@ export const EVENTS: GameEvent[] = [
     category: "Calendário",
     priority: 10,
     opening: false,
-    body: "A folia de fevereiro ocupa os quatro distritos. Os circuitos oficiais passam pela Passarela Adélia Breve, no Centro, pelo Claudinho Guimarães, em Itaipuaçu, e pelo Manhoso, em Ponta Negra. Bloco é contato prolongado. Sem medida, a transmissão por toque na orla e no comércio triplica enquanto a festa durar.",
+    body: "A folia de fevereiro ocupa os quatro distritos. Os circuitos oficiais passam pela Passarela Adélia Breve, no Centro, pelo Claudinho Guimarães, em Itaipuaçu, e pelo Manhoso, em Ponta Negra. Bloco é contato prolongado. Sem medida, a transmissão por toque na orla e no comércio fica acima do dobro enquanto a festa durar.",
     lesson: "A taxa de contato depende do comportamento. Uma festa não muda o patógeno; muda quantas vezes as pessoas se tocam.",
     monthStart: 2,
     monthEnd: 2,
@@ -52,7 +52,7 @@ export const EVENTS: GameEvent[] = [
       {
         id: "barreiras",
         label: "Barreiras sanitárias nos três circuitos",
-        outcome: "A festa continua menor. Há fila, há reclamação do comércio e a aglomeração não chega a triplicar o contato.",
+        outcome: "A festa continua menor. Há fila, há reclamação do comércio e a aglomeração sobe pouco.",
         lesson: "Reduzir densidade numa festa é controle de contato. Não é a mesma ferramenta usada contra um mosquito.",
         effects: { budget: -2.6, gathering: 1.35, durationDays: 9, factions: { comerciantes: -8, saude: 6 } },
       },
@@ -66,9 +66,9 @@ export const EVENTS: GameEvent[] = [
       {
         id: "liberar",
         label: "Não intervir na folia",
-        outcome: "O comércio comemora. Na orla e no Centro, o contato triplica pelos dias de Carnaval.",
+        outcome: "O comércio comemora. Na orla e no Centro, o contato fica acima do dobro pelos dias de Carnaval.",
         lesson: "Omissão também é política pública. O custo aparece em caso, leito e óbito, não no caixa do primeiro dia.",
-        effects: { gathering: 3, durationDays: 9, factions: { comerciantes: 8, saude: -6 } },
+        effects: { gathering: 2.2, durationDays: 9, factions: { comerciantes: 8, saude: -6 } },
       },
     ],
   },
@@ -246,7 +246,7 @@ export const EVENTS: GameEvent[] = [
     dayEnd: null,
     repeatable: false,
     cooldown: 0,
-    trigger: { type: "all", all: [{ type: "metric", metric: "day", op: "gt", value: 6 }, { type: "metric", metric: "vaccine", op: "lt", value: 86 }] },
+    trigger: { type: "all", all: [{ type: "metric", metric: "day", op: "gt", value: 28 }, { type: "metric", metric: "vaccine", op: "lt", value: 86 }] },
     choices: [
       {
         id: "bloqueio",
@@ -285,7 +285,7 @@ export const EVENTS: GameEvent[] = [
     dayEnd: null,
     repeatable: false,
     cooldown: 0,
-    trigger: { type: "all", all: [{ type: "metric", metric: "day", op: "gt", value: 12 }, { type: "metric", metric: "vaccine", op: "lt", value: 72 }] },
+    trigger: { type: "all", all: [{ type: "metric", metric: "day", op: "gt", value: 55 }, { type: "metric", metric: "vaccine", op: "lt", value: 72 }] },
     choices: [
       {
         id: "resgate",
@@ -324,7 +324,7 @@ export const EVENTS: GameEvent[] = [
     dayEnd: null,
     repeatable: true,
     cooldown: 28,
-    trigger: { type: "all", all: [{ type: "random", chance: 0.07 }, { type: "metric", metric: "day", op: "gt", value: 15 }] },
+    trigger: { type: "all", all: [{ type: "random", chance: 0.035 }, { type: "metric", metric: "day", op: "gt", value: 40 }] },
     choices: [
       {
         id: "contactantes",
@@ -516,8 +516,8 @@ export const EVENTS: GameEvent[] = [
     dayStart: null,
     dayEnd: null,
     repeatable: true,
-    cooldown: 18,
-    trigger: { type: "all", all: [{ type: "random", chance: 0.08 }, { type: "metric", metric: "day", op: "gt", value: 8 }] },
+    cooldown: 28,
+    trigger: { type: "all", all: [{ type: "random", chance: 0.035 }, { type: "metric", metric: "day", op: "gt", value: 21 }] },
     choices: [
       {
         id: "frente",
@@ -548,8 +548,8 @@ export const EVENTS: GameEvent[] = [
     dayStart: null,
     dayEnd: null,
     repeatable: true,
-    cooldown: 30,
-    trigger: { type: "all", all: [{ type: "random", chance: 0.06 }, { type: "metric", metric: "day", op: "gt", value: 18 }] },
+    cooldown: 40,
+    trigger: { type: "all", all: [{ type: "random", chance: 0.03 }, { type: "metric", metric: "day", op: "gt", value: 45 }] },
     choices: [
       {
         id: "sequenciar",
@@ -580,8 +580,8 @@ export const EVENTS: GameEvent[] = [
     dayStart: null,
     dayEnd: null,
     repeatable: true,
-    cooldown: 12,
-    trigger: { type: "all", all: [{ type: "random", chance: 0.1 }, { type: "metric", metric: "day", op: "gt", value: 5 }] },
+    cooldown: 21,
+    trigger: { type: "all", all: [{ type: "random", chance: 0.04 }, { type: "metric", metric: "day", op: "gt", value: 20 }] },
     choices: [
       {
         id: "barreira-noturna",
