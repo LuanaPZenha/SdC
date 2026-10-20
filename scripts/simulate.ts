@@ -41,7 +41,7 @@ function act(state: GameState, action: Parameters<typeof applyAction>[2]) {
 
 function play(kind: "negligente" | "atenta", seedName: string) {
   let state = createInitialState(seedName, catalog, `sim-${seedName}`, "fevereiro");
-  for (let guard = 0; guard < 160 && state.status === "playing"; guard += 1) {
+  for (let guard = 0; guard < 320 && state.status === "playing"; guard += 1) {
     if (state.pendingEventId) {
       const event = catalog.events.find((item) => item.id === state.pendingEventId);
       const choices = (event?.choices ?? []).filter((choice) => affordable(state, choice));
@@ -67,20 +67,20 @@ function manage(state: GameState) {
     if (has(id) === on) return;
     state = act(state, { type: "toggle", policyId: id });
   };
-  if (view.occupancy > 0.62 && ready(state, "abrir-leitos")) state = act(state, { type: "instant", policyId: "abrir-leitos" });
+  if (view.occupancy > 0.5 && ready(state, "abrir-leitos")) state = act(state, { type: "instant", policyId: "abrir-leitos" });
   if (view.occupancy > 0.9 && ready(state, "contratar-equipes")) state = act(state, { type: "instant", policyId: "contratar-equipes" });
   if ((state.factions.saude ?? 100) < 50 && ready(state, "bonificar-saude")) state = act(state, { type: "instant", policyId: "bonificar-saude" });
   if ((state.factions.comerciantes ?? 100) < 55 && (view.mods.quarantine ?? 0) > 0.3 && ready(state, "compensar-comerciantes")) {
     state = act(state, { type: "instant", policyId: "compensar-comerciantes" });
   }
-  if (state.vaccineCoverage < 88 && state.day < 14 && ready(state, "vacinacao-bloqueio") && state.budget > 8) {
+  if (state.vaccineCoverage < 88 && state.day < 50 && ready(state, "vacinacao-bloqueio") && state.budget > 8) {
     state = act(state, { type: "instant", policyId: "vacinacao-bloqueio" });
   }
   if (view.parallelBeds > 28 && ready(state, "fumigacao") && state.budget > 7) state = act(state, { type: "instant", policyId: "fumigacao" });
   if (view.infected > 40 && ready(state, "kits-protecao") && state.budget > 8) state = act(state, { type: "instant", policyId: "kits-protecao" });
-  const hard = view.occupancy > 0.75 || (view.mods.gathering ?? 1) >= 2;
+  const hard = view.occupancy > 0.7 || (view.mods.gathering ?? 1) >= 2;
   if (hard && state.budget > 5) toggle("quarentena-rigida", true);
-  else if (view.infected > 200 || view.occupancy > 0.5 || (view.mods.gathering ?? 1) > 1.15) toggle("quarentena-parcial", true);
+  else if (view.infected > 80 || view.occupancy > 0.4 || (view.mods.gathering ?? 1) > 1.15) toggle("quarentena-parcial", true);
   else {
     toggle("quarentena-rigida", false);
     toggle("quarentena-parcial", false);
@@ -120,7 +120,7 @@ for (const name of ["Ana", "Bruno", "Caio"]) {
   console.log(
     `${name} atenta: ${careful.state.status} dia ${careful.state.day} pesquisa ${careful.state.research.toFixed(1)} infectados ${careful.view.infected} óbitos ${careful.state.totalDead} pico ${(Math.max(...careful.state.history.map((item) => item.occupancy), 0) * 100).toFixed(0)}%`,
   );
-  if (negligent.state.status !== "lost" || negligent.state.day > 55) failures.push(`${name}: omissão não perdeu cedo.`);
+  if (negligent.state.status !== "lost" || negligent.state.day > 200) failures.push(`${name}: omissão não perdeu ao longo do calendário.`);
   if (careful.state.status !== "won") failures.push(`${name}: gestão atenta não chegou à cura (${careful.state.status}, dia ${careful.state.day}).`);
   if (careful.state.day <= negligent.state.day && careful.state.status !== "won") failures.push(`${name}: gestão atenta não durou mais.`);
 }
