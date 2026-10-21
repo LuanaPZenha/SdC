@@ -223,6 +223,10 @@ Estas são as atualizações que estão no jogo publicado, em cima do simulador 
 
 `npm run sim` roda três sementes (Ana, Bruno e Caio). Em cada uma, uma gestão que ignora a crise precisa perder em até 200 dias, e uma gestão que contém, pesquisa e responde aos boletins precisa chegar à cura. A gestão atenta segura quarentena parcial enquanto há muitos infectados, ocupação alta ou aglomeração, abre leitos quando a ocupação passa de metade e usa a janela de vacinação no começo. O ensaio para aos 320 dias.
 
+_______________________
+IAs usadas: 
+Cursor: Grok 4.7
+
 Autores: 
 Amanda Nick - Líder do Projeto
 
