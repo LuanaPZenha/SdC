@@ -223,15 +223,18 @@ Estas são as atualizações que estão no jogo publicado, em cima do simulador 
 
 `npm run sim` roda três sementes (Ana, Bruno e Caio). Em cada uma, uma gestão que ignora a crise precisa perder em até 200 dias, e uma gestão que contém, pesquisa e responde aos boletins precisa chegar à cura. A gestão atenta segura quarentena parcial enquanto há muitos infectados, ocupação alta ou aglomeração, abre leitos quando a ocupação passa de metade e usa a janela de vacinação no começo. O ensaio para aos 320 dias.
 
-_______________________
-IAs usadas: 
-Cursor: Grok 4.7
+## Equipe
 
-Autores: 
-Amanda Nick - Líder do Projeto
+| Nome | Papel |
+| --- | --- |
+| Amanda Nick | Líder do projeto e documentação |
+| Renan Monteiro | Requisitos e análise do projeto |
+| Bruno Barral | Fullstack |
+| Luana Zenha | Fullstack |
 
-Bruno Barral - FullStack
+## Inteligências artificiais
 
-Luana Zenha - Full Stack
+O jogo foi construído com apoio destas ferramentas. A concepção, o que entra na sala e a revisão do que está publicado ficam com a equipe.
 
-Renan Monteiro - Análise e Requisitos
+- **Grok 4.7** (xAI), no Cursor. A partir do documento de concepção, escreveu o simulador: motor de cada dia, telas, persistência, textos da sala, arquitetura e este README.
+- **Impeccable**. Conduziu a adaptação da capa, da sala, do mapa e do placar para o celular, preservando a sala escura, o latão e a tipografia.
