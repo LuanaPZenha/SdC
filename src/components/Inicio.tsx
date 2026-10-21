@@ -87,7 +87,14 @@ export function Inicio() {
           <h2 className="display">Assumir a sala de situação</h2>
           <label className="field">
             Nome no placar
-            <input value={name} maxLength={24} onChange={(event) => setName(event.target.value)} placeholder="Seu nome" />
+            <input
+              value={name}
+              maxLength={24}
+              autoComplete="nickname"
+              enterKeyHint="go"
+              onChange={(event) => setName(event.target.value)}
+              placeholder="Seu nome"
+            />
           </label>
           <div className="checks">
             {STARTS.map((start) => (

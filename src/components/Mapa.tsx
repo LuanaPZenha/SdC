@@ -168,8 +168,8 @@ export function Mapa({
     <svg
       className="atlas"
       viewBox={`0 0 ${MAP_VIEW.width} ${MAP_VIEW.height}`}
-      role="img"
-      aria-label="Mapa do município de Maricá, com o contorno do IBGE e os recortes clicáveis"
+      role="group"
+      aria-label="Mapa do município de Maricá, com o contorno do IBGE e os recortes"
     >
       <defs>
         <radialGradient id="sdc-ocean" cx="48%" cy="46%" r="72%">
@@ -197,7 +197,17 @@ export function Mapa({
               d={shape.path}
               fill={heat(district.attackPer10k)}
               className={id === selected ? "region selected" : "region"}
+              role="button"
+              tabIndex={0}
+              aria-pressed={id === selected}
+              aria-label={`${shape.name}, ${people(district.infected)} infectados`}
               onClick={() => onSelect(id)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  onSelect(id);
+                }
+              }}
             />
           );
         })}

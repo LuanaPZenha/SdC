@@ -46,15 +46,15 @@ export function Placar() {
           <tbody>
             {(rows ?? []).map((row, index) => (
               <tr key={row.id}>
-                <td>{index + 1}</td>
-                <td>{row.playerName}</td>
-                <td>{row.daysSurvived}</td>
-                <td>{row.research.toFixed(0)}%</td>
-                <td>{people(row.dead)}</td>
-                <td>
+                <td data-label="#">{index + 1}</td>
+                <td data-label="Gestão">{row.playerName}</td>
+                <td data-label="Dias">{row.daysSurvived}</td>
+                <td data-label="Pesquisa">{row.research.toFixed(0)}%</td>
+                <td data-label="Óbitos">{people(row.dead)}</td>
+                <td data-label="Desfecho">
                   <span className={row.outcome === "won" ? "badge win" : "badge lost"}>{row.endingTitle}</span>
                 </td>
-                <td>{row.score}</td>
+                <td data-label="Pontos">{row.score}</td>
               </tr>
             ))}
             {rows && rows.length === 0 ? (

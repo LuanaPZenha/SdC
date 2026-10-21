@@ -85,6 +85,7 @@ export function Sala() {
   const pendingNews = useRef<Flash[]>([]);
   const ticking = useRef(false);
   const actRef = useRef<(body: object) => Promise<void>>(async () => undefined);
+  const stripRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -154,6 +155,21 @@ export function Sala() {
 
   const district = useMemo(() => view?.districts.find((item) => item.id === selected) ?? view?.districts[0], [view, selected]);
 
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 820px), (max-width: 1024px) and (max-height: 500px) and (orientation: landscape)");
+    if (!media.matches) return;
+    window.scrollTo(0, 0);
+  }, [panel, tab]);
+
+  useEffect(() => {
+    const root = stripRef.current;
+    if (!root) return;
+    const chip = root.querySelector<HTMLElement>(`[data-district="${selected}"]`);
+    if (!chip) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    root.scrollTo({ left: Math.max(0, chip.offsetLeft - 12), behavior: reduce ? "auto" : "smooth" });
+  }, [selected, panel]);
+
   if (!id || missing) {
     return (
       <main className="home" id="conteudo">
@@ -199,31 +215,53 @@ export function Sala() {
               </div>
             ) : null}
           </div>
-          <Meter label="Fundo emergencial" value={`R$ ${money(view.budget)} mi`} width={Math.min(100, (view.budget / 30) * 100)} hint={`Receita prevista ${money(view.income)} · manutenção ${money(view.upkeep)}`} />
-          <Meter label="Ocupação hospitalar" value={`${Math.round(view.occupancy * 100)}%`} width={Math.min(100, view.occupancy * 100)} bad={view.occupancy > 0.85} hint={`${Math.round(view.apatiaBeds)} leitos da Apatia · ${Math.round(view.parallelBeds)} de outras síndromes · ${Math.round(view.capacity)} vagas`} />
-          <Meter label="Ordem pública" value={`${Math.round(view.order)}`} width={view.order} bad={view.order < 40} hint="Comércio, equipes e população" />
+          <Meter label="Fundo emergencial" short="Fundo" value={`R$ ${money(view.budget)} mi`} width={Math.min(100, (view.budget / 30) * 100)} hint={`Receita prevista ${money(view.income)} · manutenção ${money(view.upkeep)}`} />
+          <Meter label="Ocupação hospitalar" short="Leitos" value={`${Math.round(view.occupancy * 100)}%`} width={Math.min(100, view.occupancy * 100)} bad={view.occupancy > 0.85} hint={`${Math.round(view.apatiaBeds)} leitos da Apatia · ${Math.round(view.parallelBeds)} de outras síndromes · ${Math.round(view.capacity)} vagas`} />
+          <Meter label="Ordem pública" short="Ordem" value={`${Math.round(view.order)}`} width={view.order} bad={view.order < 40} hint="Comércio, equipes e população" />
         </div>
       </header>
       <nav className="views" aria-label="Painéis da sala">
         <div className="tabs" role="tablist">
-          <button className={panel === "sala" ? "tab icon-tab on" : "tab icon-tab"} type="button" onClick={() => setPanel("sala")}>
+          <button className={panel === "sala" ? "tab icon-tab on" : "tab icon-tab"} type="button" role="tab" id="aba-sala" aria-selected={panel === "sala"} aria-controls="painel-sala" onClick={() => setPanel("sala")}>
             <SalaIcon />
             <span>Sala</span>
           </button>
-          <button className={panel === "gestao" ? "tab icon-tab on" : "tab icon-tab"} type="button" onClick={() => setPanel("gestao")}>
+          <button
+            className={panel === "gestao" ? "tab icon-tab on" : "tab icon-tab"}
+            type="button"
+            role="tab"
+            aria-selected={panel === "gestao"}
+            id="aba-gestao"
+            aria-controls="painel-gestao"
+            aria-label={activeUpgrades > 0 ? `Gestão, ${activeUpgrades} medidas ativas` : "Gestão"}
+            onClick={() => setPanel("gestao")}
+          >
             <GestaoIcon />
-            <span>Gestão{activeUpgrades > 0 ? ` · ${activeUpgrades}` : ""}</span>
+            <span>
+              Gestão
+              {activeUpgrades > 0 ? <span className="tab-inline"> · {activeUpgrades}</span> : null}
+            </span>
+            {activeUpgrades > 0 ? <span className="tab-badge">{activeUpgrades}</span> : null}
           </button>
           <button
             className={panel === "news" ? "tab icon-tab on" : "tab icon-tab"}
             type="button"
+            role="tab"
+            aria-selected={panel === "news"}
+            id="aba-news"
+            aria-controls="painel-news"
+            aria-label={unread ? "News, novidade sem leitura" : "News"}
             onClick={() => {
               setPanel("news");
               setUnread(false);
             }}
           >
             <NewsIcon />
-            <span>News{unread ? " · novo" : ""}</span>
+            <span>
+              News
+              {unread ? <span className="tab-inline"> · novo</span> : null}
+            </span>
+            {unread ? <span className="tab-pip" aria-hidden="true" /> : null}
           </button>
         </div>
         <button className="end-day" type="button" title="Encerra o dia agora. Se ninguém apertar, o relógio fecha o dia em 60 segundos." disabled={busy || view.status !== "playing" || Boolean(view.pending)} onClick={() => void act({ action: "end" })}>
@@ -231,7 +269,7 @@ export function Sala() {
         </button>
       </nav>
       {panel === "sala" ? (
-      <div className="war">
+      <div className="war" id="painel-sala" role="tabpanel" aria-labelledby="aba-sala">
         <section className="plate">
           <div className="plate-head">
             <h2 className="display">Maricá</h2>
@@ -244,6 +282,21 @@ export function Sala() {
             trips={view.report?.trips ?? []}
             supplyRuns={view.report?.supplyRuns ?? []}
           />
+          <div className="district-strip" ref={stripRef} role="group" aria-label="Recortes de Maricá">
+            {view.districts.map((item) => (
+              <button
+                key={item.id}
+                className={item.id === district.id ? "district-chip on" : "district-chip"}
+                type="button"
+                data-district={item.id}
+                aria-pressed={item.id === district.id}
+                onClick={() => setSelected(item.id)}
+              >
+                <span>{item.name}</span>
+                <strong>{people(item.infected)}</strong>
+              </button>
+            ))}
+          </div>
           <div className="detail">
             <div className="stat">
               <span>{district.officialDistrict}</span>
@@ -299,14 +352,14 @@ export function Sala() {
         </aside>
       </div>
       ) : panel === "gestao" ? (
-      <section className="upgrades" id="gestao">
+      <section className="upgrades" id="painel-gestao" role="tabpanel" aria-labelledby="aba-gestao">
         <div className="plate-head">
           <h2 className="display">Gestão</h2>
           <span>Medidas da gestão. Cada uma altera verba, contato, leitos ou confiança.</span>
         </div>
         <div className="tabs" role="tablist" aria-label="Famílias de medidas">
           {TABS.map((item) => (
-            <button key={item.id} className={item.id === tab ? "tab on" : "tab"} type="button" onClick={() => setTab(item.id)}>
+            <button key={item.id} className={item.id === tab ? "tab on" : "tab"} type="button" role="tab" aria-selected={item.id === tab} onClick={() => setTab(item.id)}>
               {item.label}
             </button>
           ))}
@@ -318,7 +371,7 @@ export function Sala() {
         </div>
       </section>
       ) : (
-      <section className="news" id="news">
+      <section className="news" id="painel-news" role="tabpanel" aria-labelledby="aba-news">
         <div className="plate-head">
           <h2 className="display">News</h2>
           <span>Boletins, registro e o que a cidade acabou de informar.</span>
@@ -457,10 +510,13 @@ export function Sala() {
   );
 }
 
-function Meter({ label, value, width, hint, bad = false }: { label: string; value: string; width: number; hint: string; bad?: boolean }) {
+function Meter({ label, short, value, width, hint, bad = false }: { label: string; short: string; value: string; width: number; hint: string; bad?: boolean }) {
   return (
-    <div className="gauge" title={hint}>
-      <span>{label}</span>
+    <div className="gauge" title={`${label}. ${hint}`} aria-label={`${label}: ${value}. ${hint}`}>
+      <span>
+        <span className="meter-long">{label}</span>
+        <span className="meter-short">{short}</span>
+      </span>
       <strong>{value}</strong>
       <div className={bad ? "bar bad" : "bar ok"} aria-hidden="true">
         <i style={{ width: `${Math.max(0, Math.min(100, width))}%` }} />
